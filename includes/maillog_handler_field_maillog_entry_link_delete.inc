@@ -1,4 +1,4 @@
-<?php 
+<?php
 // $Id$
 
 /**
@@ -29,4 +29,4 @@ class maillog_handler_field_maillog_entry_link_delete extends views_handler_fiel
     return l($text, "maillog/delete/$values->maillog_id", array('query' => drupal_get_destination()));
   }
 }
-  
+

@@ -36,7 +36,7 @@ function maillog_views_data() {
       'handler' => 'views_handler_argument_string',
     ),
   );
-  
+
   $data['maillog']['header_message_id'] = array(
     'title' => t('Message_ID'),
     'help' => t("The 'Message_ID' e-mail address."),
@@ -54,7 +54,7 @@ function maillog_views_data() {
       'handler' => 'views_handler_argument_string',
     ),
   );
-  
+
   $data['maillog']['header_from'] = array(
     'title' => t('From'),
     'help' => t("The 'From' field of the e-mail address."),
@@ -180,7 +180,7 @@ function maillog_views_data() {
       'handler' => 'views_handler_argument_string',
     ),
   );
-  
+
   $data['maillog']['delete_maillog_entry'] = array(
     'field' => array(
       'title' => t('Delete link'),
