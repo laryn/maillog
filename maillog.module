@@ -344,7 +344,6 @@ function maillog_mail_send($message, $mailengine_call = FALSE) {
   }
 
   // Display the e-mail using Devel module
-  dsm($message);
   if (variable_get('maillog_devel', TRUE) && function_exists('dpm')) {
     $devel_message_array = array();
     $devel_message_array[t('Subject')] = $message['subject'];
@@ -366,6 +365,10 @@ function maillog_mail_send($message, $mailengine_call = FALSE) {
     if ($mailengine_call == TRUE) {
       $engine = variable_get('maillog_engine', '') .'_mailengine';
       if (function_exists($engine) && ($engine != 'maillog_mailengine')) {
+        $message['sender'] = $message['from'];
+        $message['address'] = $message['to'];
+        unset($message['from']);
+        unset($message['to']);
         $ret = $engine('send', $message);
         $mail_sent = TRUE;
       }
