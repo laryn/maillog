@@ -18,9 +18,16 @@
  */
 
 /**
+ * Implementation of hook_perm().
+ */
+function maillog_perm() {
+  return array('view maillog', 'delete maillog', 'administer maillog');
+}
+
+/**
  * Implementation of hook_menu().
  */
-function maillog_delete_maillog_entry( $maillog ) {
+function maillog_maillog_delete( $maillog ) {
   $maillog_id = $maillog['maillog_id'];
   $result = db_query("DELETE FROM {maillog} WHERE `maillog_id` = '%d'", $maillog_id);
   if ($result == FALSE) {
@@ -48,20 +55,19 @@ function maillog_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['maillog/delete/%maillog_id'] = array(
+  $items['maillog/delete/%maillog_maillog'] = array(
     'title' => t("Delete Mail Log from 'maillog' Table"),
     'description' => t("Delete the Mail Log with the maillog_id given by the parameter from 'maillog' Table"),
-    'page callback' => 'maillog_delete_maillog_entry',
+    'page callback' => 'maillog_maillog_delete',
     'page arguments' => array(2),
     'access arguments' => array('delete maillog'),
     'type' => MENU_CALLBACK,
   );
-  $items['maillog/details/%maillog_id'] = array(
-    'title callback' => 'maillog_title',
+  $items['maillog/details/%maillog_maillog'] = array(
+    'title callback' => 'maillog_maillog_title',
     'title arguments' => array(2),
-    //'title' => t("Show"),
     'description' => t("Delete the Mail Log with the maillog_id given by the parameter from 'maillog' Table"),
-    'page callback' => 'maillog_page',
+    'page callback' => 'maillog_maillog_page',
     'page arguments' => array(2),
     'access arguments' => array('view maillog'),
     'type' => MENU_CALLBACK,
@@ -70,24 +76,31 @@ function maillog_menu() {
   return $items;
 }
 
-function maillog_title($maillog) {
+/**
+ *
+ */
+function maillog_maillog_title($maillog) {
   return $maillog['subject'];
 }
-function maillog_id_load($maillog_id) {
-  // load from SQL
-  //
+
+/**
+ *
+ */
+function maillog_maillog_load($maillog_id) {
   $result = db_query("SELECT maillog_id, header_from, header_to, header_reply_to, header_all, subject, body FROM {maillog} WHERE maillog_id = '%d'", $maillog_id );
   if ($result == FALSE) {
     $maillog = NULL;
   }
-  else{
+  else {
     $maillog = db_fetch_array($result);
   }
   return $maillog;
 }
 
-function maillog_page($maillog) {
-  // load maillog
+/**
+ *
+ */
+function maillog_maillog_page($maillog) {
   return theme('maillog', $maillog);
 }
 
@@ -139,18 +152,11 @@ function maillog_views_api() {
 }
 
 /**
- * Implementation of hook_perm().
- */
-function maillog_perm() {
-  return array('view maillog', 'delete maillog', 'administer maillog');
-}
-
-/**
  * Implementation of hook_mailengine from mimemail modul
  */
 
 function maillog_mailengine($op, $message = NULL) {
-  //default values
+  // default values
   if (is_array($message)) {
     $message = array_merge( array(
         'address' => '',
@@ -168,7 +174,7 @@ function maillog_mailengine($op, $message = NULL) {
     case 'description':
       return t("Maillog engine using drupal_mail() or another mailengine from maillog_mailengine variable to send mail.");
 
-    case 'settings': //not implemented
+    case 'settings': // not implemented
       return FALSE;
 
     case 'multiple':
@@ -183,20 +189,6 @@ function maillog_mailengine($op, $message = NULL) {
   }
 }
 
-/**
- * Implementation of hook_access().
- * ONLY FOR NODES REQUIRED
-function maillog_access($op, $node, $account) {
-  switch ($op) {
-    case 'delete':
-      return user_access('delete maillog');
-      break;
-    case 'view':
-      return user_access('view maillog');
-      break;
-  }
-}
- */
 /**
  * Implementation of hook_theme().
  */
@@ -224,6 +216,10 @@ function theme_maillog_header_from($header_from) {
 
   return $output;
 }
+
+/**
+ *
+ */
 function theme_maillog($maillog) {
   $output = theme( 'maillog_header_from', $maillog['header_from'] );
   $output .= theme( 'maillog_header_to', $maillog['header_to'] );
