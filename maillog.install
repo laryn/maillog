@@ -84,7 +84,7 @@ function maillog_schema() {
   $schema['maillog'] = array(
     'description' => t("Stores outgoing e-mail details for nodes of type 'maillog'."),
     'fields' => array(
-      'maillog_id' => array(
+      'idmaillog' => array(
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
@@ -141,7 +141,7 @@ function maillog_schema() {
         'default' => 0,
       ),
     ),
-    'primary key' => array('maillog_id'),
+    'primary key' => array('idmaillog'),
   );
 
   return $schema;

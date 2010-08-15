@@ -11,7 +11,7 @@
  */
 function maillog_views_default_views() {
 $view = new view;
-$view->name = 'maillog';
+$view->name = 'Maillog';
 $view->description = 'Displays the list of e-mails logged by the \'Mail Log\' module.';
 $view->tag = '';
 $view->view_php = '';
@@ -21,7 +21,7 @@ $view->api_version = 2;
 $view->disabled = FALSE; /* Edit this to true to make a default view disabled initially */
 $handler = $view->new_display('default', 'Defaults', 'default');
 $handler->override_option('fields', array(
-  'maillog_id' => array(
+  'idmaillog' => array(
     'label' => 'Maillog_ID',
     'alter' => array(
       'alter_text' => 0,
@@ -45,9 +45,9 @@ $handler->override_option('fields', array(
     'hide_empty' => 0,
     'empty_zero' => 0,
     'exclude' => 1,
-    'id' => 'maillog_id',
+    'id' => 'idmaillog',
     'table' => 'maillog',
-    'field' => 'maillog_id',
+    'field' => 'idmaillog',
     'relationship' => 'none',
   ),
   'sent_date' => array(
@@ -90,7 +90,7 @@ $handler->override_option('fields', array(
       'alter_text' => 0,
       'text' => '',
       'make_link' => 1,
-      'path' => 'maillog/details/[maillog_id]',
+      'path' => 'maillog/details/[idmaillog]',
       'link_class' => '',
       'alt' => '',
       'prefix' => '',
@@ -171,7 +171,7 @@ $handler->override_option('fields', array(
     'field' => 'header_to',
     'relationship' => 'none',
   ),
-  'delete_maillog_entry' => array(
+  'delete_maillog' => array(
     'label' => 'Delete link',
     'alter' => array(
       'alter_text' => 0,
@@ -195,9 +195,9 @@ $handler->override_option('fields', array(
     'hide_empty' => 0,
     'empty_zero' => 0,
     'exclude' => 0,
-    'id' => 'delete_maillog_entry',
+    'id' => 'delete_maillog',
     'table' => 'maillog',
-    'field' => 'delete_maillog_entry',
+    'field' => 'delete_maillog',
     'relationship' => 'none',
   ),
 ));
@@ -217,14 +217,17 @@ $handler->override_option('access', array(
 $handler->override_option('cache', array(
   'type' => 'none',
 ));
+$handler->override_option('title', 'Maillog');
+$handler->override_option('empty', 'Maillog is currently empty. Send a mail!');
+$handler->override_option('empty_format', '1');
 $handler->override_option('use_pager', '1');
 $handler->override_option('style_plugin', 'table');
 $handler = $view->new_display('page', 'Page', 'page_1');
 $handler->override_option('path', 'maillog/log');
 $handler->override_option('menu', array(
   'type' => 'normal',
-  'title' => 'maillog',
-  'description' => 'Show the logged eMails',
+  'title' => 'Maillog',
+  'description' => 'Show the logged mails',
   'weight' => '0',
   'name' => 'navigation',
 ));

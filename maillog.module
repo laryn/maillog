@@ -28,13 +28,13 @@ function maillog_perm() {
  * Implementation of hook_menu().
  */
 function maillog_maillog_delete( $maillog ) {
-  $maillog_id = $maillog['maillog_id'];
-  $result = db_query("DELETE FROM {maillog} WHERE `maillog_id` = '%d'", $maillog_id);
+  $idmaillog = $maillog['idmaillog'];
+  $result = db_query("DELETE FROM {maillog} WHERE `idmaillog` = '%d'", $idmaillog);
   if ($result == FALSE) {
-    drupal_set_message(t('A Problem occured when deleting Mail with maillog_id !maillog_id !', array('!maillog_id' => $maillog_id)));
+    drupal_set_message(t('A Problem occured when deleting Mail with idmaillog !idmaillog !', array('!idmaillog' => $idmaillog)));
   }
   else {
-    drupal_set_message(t('Mail with maillog_id !maillog_id has been deleted!', array('!maillog_id' => $maillog_id)));
+    drupal_set_message(t('Mail with idmaillog !idmaillog has been deleted!', array('!idmaillog' => $idmaillog)));
   }
   drupal_goto('maillog/log');
   return '';
@@ -57,7 +57,7 @@ function maillog_menu() {
 
   $items['maillog/delete/%maillog_maillog'] = array(
     'title' => t("Delete Mail Log from 'maillog' Table"),
-    'description' => t("Delete the Mail Log with the maillog_id given by the parameter from 'maillog' Table"),
+    'description' => t("Delete the Mail Log with the idmaillog given by the parameter from 'maillog' Table"),
     'page callback' => 'maillog_maillog_delete',
     'page arguments' => array(2),
     'access arguments' => array('delete maillog'),
@@ -66,7 +66,7 @@ function maillog_menu() {
   $items['maillog/details/%maillog_maillog'] = array(
     'title callback' => 'maillog_maillog_title',
     'title arguments' => array(2),
-    'description' => t("Delete the Mail Log with the maillog_id given by the parameter from 'maillog' Table"),
+    'description' => t("Delete the Mail Log with the idmaillog given by the parameter from 'maillog' Table"),
     'page callback' => 'maillog_maillog_page',
     'page arguments' => array(2),
     'access arguments' => array('view maillog'),
@@ -86,8 +86,8 @@ function maillog_maillog_title($maillog) {
 /**
  *
  */
-function maillog_maillog_load($maillog_id) {
-  $result = db_query("SELECT maillog_id, header_from, header_to, header_reply_to, header_all, subject, body FROM {maillog} WHERE maillog_id = '%d'", $maillog_id );
+function maillog_maillog_load($idmaillog) {
+  $result = db_query("SELECT idmaillog, header_from, header_to, header_reply_to, header_all, subject, body FROM {maillog} WHERE idmaillog = '%d'", $idmaillog );
   if ($result == FALSE) {
     $maillog = NULL;
   }
