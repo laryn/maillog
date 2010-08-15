@@ -11,7 +11,7 @@
  */
 if (!function_exists('drupal_mail_wrapper')) {
   function drupal_mail_wrapper($message) {
-  maillog_send_mail($message);
+  maillog_mail_send($message);
   }
   // @todo: check return value
 }
