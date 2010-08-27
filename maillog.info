@@ -1,12 +1,5 @@
 ; $Id$
 name = Maillog
-description = Creates a content type 'Logged Mail', a view 'Logged Mails' and logs all outgoing e-mails in nodes.
+description = Utility to log all Mails for debugging purposes. It's possible to suppress mail delivery for e.g. dev or staging systems.
 dependencies[] = views
 core = 6.x
-
-; Information added by drupal.org packaging script on 2010-08-15
-version = "6.x-1.x-dev"
-core = "6.x"
-project = "maillog"
-datestamp = "1281874457"
-
