@@ -47,8 +47,8 @@ function maillog_menu() {
   $items = array();
 
   $items['admin/settings/maillog'] = array(
-    'title' => t('Mail Log Settings'),
-    'description' => t('Configure the settings of Mail Log module.'),
+    'title' => t('Maillog Settings'),
+    'description' => t('Configure the settings of Maillog module.'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('maillog_admin_settings'),
     'access arguments' => array('administer maillog'),
@@ -56,8 +56,8 @@ function maillog_menu() {
   );
 
   $items['maillog/delete/%maillog_maillog'] = array(
-    'title' => t("Delete Mail Log from 'maillog' Table"),
-    'description' => t("Delete the Mail Log with the idmaillog given by the parameter from 'maillog' Table"),
+    'title' => t("Delete Maillog from 'maillog' Table"),
+    'description' => t("Delete the Maillog with the idmaillog given by the parameter from 'maillog' Table"),
     'page callback' => 'maillog_maillog_delete',
     'page arguments' => array(2),
     'access arguments' => array('delete maillog'),
@@ -66,7 +66,7 @@ function maillog_menu() {
   $items['maillog/details/%maillog_maillog'] = array(
     'title callback' => 'maillog_maillog_title',
     'title arguments' => array(2),
-    'description' => t("Delete the Mail Log with the idmaillog given by the parameter from 'maillog' Table"),
+    'description' => t("Delete the Maillog with the idmaillog given by the parameter from 'maillog' Table"),
     'page callback' => 'maillog_maillog_page',
     'page arguments' => array(2),
     'access arguments' => array('view maillog'),
@@ -317,7 +317,7 @@ function maillog_mail_send($message, $mailengine_call = FALSE) {
   static $recursive_send = FALSE;
 
   if ($recursive_send) {
-    drupal_set_message(t('Mail Log has detected recursive mail sending.'), 'warning');
+    drupal_set_message(t('Maillog has detected recursive mail sending.'), 'warning');
     return FALSE;
   }
 
@@ -386,7 +386,7 @@ function maillog_mail_send($message, $mailengine_call = FALSE) {
     static $mailwarning = TRUE;
     if ($mailwarning == TRUE) {
       if (user_access('administer maillog')) {
-        drupal_set_message(t('Sending of e-mail messages is disabled by Mail Log module. Go ' . l('here', 'admin/settings/maillog') . ' to enable.'), 'warning', TRUE);
+        drupal_set_message(t('Sending of e-mail messages is disabled by Maillog module. Go ' . l('here', 'admin/settings/maillog') . ' to enable.'), 'warning', TRUE);
       }
       else {
         drupal_set_message(t('Drupal tried to send a mail. Note that mails are disabled currently.'), 'warning', TRUE);

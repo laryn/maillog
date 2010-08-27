@@ -10,11 +10,11 @@
  * Implementation of hook_views_data().
  */
 function maillog_views_data() {
-  $data['maillog']['table']['group'] = t('Mail Log');
+  $data['maillog']['table']['group'] = t('Maillog');
 
   $data['maillog']['table']['base'] = array(
     'field' => 'idmaillog',
-    'title' => t('Mail Log'),
+    'title' => t('Maillog'),
     'help' => t("This table contains the logged e-mails."),
     'weight' => -10,
   );

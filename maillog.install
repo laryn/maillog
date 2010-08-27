@@ -13,15 +13,15 @@ function maillog_requirements($phase) {
   if ($phase == 'runtime') {
     if (variable_get('smtp_library', '') != drupal_get_path('module', 'maillog') . '/includes/maillog.inc') {
       $requirements[] = array(
-        'title' => 'Mail Log: SMTP Library',
-        'description' => t('SMTP library is not set to use Mail Log. To fix the situation, re-enable Mail Log in order to reset the SMTP library.'),
+        'title' => 'Maillog: SMTP Library',
+        'description' => t('SMTP library is not set to use Maillog. To fix the situation, re-enable Maillog in order to reset the SMTP library.'),
         'severity' => REQUIREMENT_ERROR,
       );
     }
     else {
       $requirements[] = array(
-        'title' => 'Mail Log: SMTP Library',
-        'description' => t('SMTP library is set to use Mail Log.'),
+        'title' => 'Maillog: SMTP Library',
+        'description' => t('SMTP library is set to use Maillog.'),
         'severity' => 'REQUIREMENT_OK',
       );
     }
