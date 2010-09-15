@@ -14,7 +14,7 @@
  *
  * mail flow:
  * drupal_mail -> maillog:drupal_mail_wrapper -> maillog_mail_send
- * mimemail -> maillog_engine -> maillog_mail_send [-> ANY_engine]
+ * mimemail -> maillog_mailengine -> maillog_mail_send [-> ANY_engine]
  */
 
 /**
@@ -93,6 +93,8 @@ function maillog_maillog_load($idmaillog) {
   }
   else {
     $maillog = db_fetch_array($result);
+    // unserialize values
+    $maillog['header_all'] = unserialize($maillog['header_all']);
   }
   return $maillog;
 }
@@ -264,15 +266,13 @@ function theme_maillog_header_reply_to($header_reply_to) {
 function theme_maillog_header_all($header_all) {
   $output = '';
 
-  $header_all_data = unserialize($header_all);
-
   $output .= '<div class="field mail-log-header-all">';
   $output .= '<div class="field-label">' . t('Header') . ':</div>';
   $output .= '<div class="field-item">';
 
-  foreach ($header_all_data as $header_all_name => $header_all_value) {
+  foreach ($header_all as $header_all_name => $header_all_value) {
     $output .= '<div class="mail-log-header-all-subitem">';
-    $output .= $header_all_name . ': ' . $header_all_value;
+    $output .= check_plain($header_all_name) . ': ' . check_plain($header_all_value);
     $output .= '</div>';
   }
 
@@ -292,7 +292,7 @@ function theme_maillog_body($body) {
   $output .= '<div class="field-label">' . t('Body') . ':</div>';
   $output .= '<div class="field-item">';
   $output .= '<pre>';
-  $output .= $body;
+  $output .= check_plain($body);
   $output .= '</pre>';
   $output .=  '</div>';
   $output .= '</div>';
@@ -353,6 +353,7 @@ function maillog_mail_send($message, $mailengine_call = FALSE) {
   }
 
   // Send the e-mail
+  $ret = FALSE;
   if (variable_get('maillog_send', TRUE)) {
     // note: CORE: we're unable to support further mail wrappers here (function name limit)
     // We implement mimemail hook_engine for extensibility.
@@ -393,7 +394,7 @@ function maillog_mail_send($message, $mailengine_call = FALSE) {
       }
     }
     $mailwarning = FALSE;
-    // important: report face success for sending mail for debugging purposes
+    // important: report fake success for sending mail for debugging purposes
     $ret = TRUE;
   }
   $recursive_send = FALSE;
