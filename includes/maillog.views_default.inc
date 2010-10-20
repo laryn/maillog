@@ -223,7 +223,7 @@ $handler->override_option('empty_format', '1');
 $handler->override_option('use_pager', '1');
 $handler->override_option('style_plugin', 'table');
 $handler = $view->new_display('page', 'Page', 'page_1');
-$handler->override_option('path', 'maillog/log');
+$handler->override_option('path', 'admin/reports/maillog');
 $handler->override_option('menu', array(
   'type' => 'normal',
   'title' => 'Maillog',
