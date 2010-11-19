@@ -213,7 +213,7 @@ function theme_maillog_header_from($header_from) {
 
   $output .= '<div class="field mail-log-header-from">';
   $output .= '<div class="field-label">' . t('From') . ':</div>';
-  $output .= '<div class="field-item">' . $header_from . '</div>';
+  $output .= '<div class="field-item">' . check_plain($header_from) . '</div>';
   $output .= '</div>';
 
   return $output;
@@ -240,7 +240,7 @@ function theme_maillog_header_to($header_to) {
 
   $output .= '<div class="field mail-log-header-to">';
   $output .= '<div class="field-label">' . t('To') . ':</div>';
-  $output .= '<div class="field-item">' . $header_to . '</div>';
+  $output .= '<div class="field-item">' . check_plain($header_to) . '</div>';
   $output .= '</div>';
 
   return $output;
@@ -254,7 +254,7 @@ function theme_maillog_header_reply_to($header_reply_to) {
 
   $output .= '<div class="field mail-log-header-reply-to">';
   $output .= '<div class="field-label">' . t('Reply To') . ':</div>';
-  $output .= '<div class="field-item">' . $header_reply_to . '</div>';
+  $output .= '<div class="field-item">' . check_plain($header_reply_to) . '</div>';
   $output .= '</div>';
 
   return $output;
@@ -341,15 +341,15 @@ function maillog_mail_send($message, $mailengine_call = FALSE) {
 
   // Display the e-mail using Devel module
   if (variable_get('maillog_devel', TRUE) && function_exists('dpm')) {
-    $devel_message_array = array();
-    $devel_message_array[t('Subject')] = $message['subject'];
-    $devel_message_array[t('From')] = $message['from'];
-    $devel_message_array[t('To')] = $message['to'];
-    $devel_message_array[t('Reply-To')] = $message['reply_to'];
-    $devel_message_array[t('Header')] = $message['headers'];
-    $devel_message_array[t('Body')] = $message['body'];
+    $devel_msg = array();
+    $devel_msg[t('Subject')] = $message['subject'];
+    $devel_msg[t('From')] = $message['from'];
+    $devel_msg[t('To')] = $message['to'];
+    $devel_msg[t('Reply-To')] = $message['reply_to'];
+    $devel_msg[t('Header')] = $message['headers'];
+    $devel_msg[t('Body')] = $message['body'];
 
-    dpm($devel_message_array, 'maillog');
+    dpm($devel_msg, 'maillog');
   }
 
   // Send the e-mail
@@ -371,16 +371,17 @@ function maillog_mail_send($message, $mailengine_call = FALSE) {
       }
     }
     if ($mail_sent == FALSE) {
+      // build headers
       $mimeheaders = array();
       foreach ($message['headers'] as $name => $value) {
         $mimeheaders[] = $name .': '. mime_header_encode($value);
       }
-      $ret = mail(
-        $message['to'],
-        mime_header_encode($message['subject']),
-        str_replace("\r", '', $message['body']),
-        join("\n", $mimeheaders)
-      );
+      $mail_headers = join("\n", $mimeheaders);
+      // encode subject
+      $mail_subject = mime_header_encode($message['subject']);
+      // cleanup body
+      $mail_body = str_replace("\r", '', $message['body']);
+      $ret = mail( $message['to'], $mail_subject, $mail_body, $mail_headers);
     }
   }
   else {
