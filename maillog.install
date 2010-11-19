@@ -10,6 +10,8 @@
  * Implementation of hook_requirements().
  */
 function maillog_requirements($phase) {
+  $requirements = array();
+
   if ($phase == 'runtime') {
     if (variable_get('smtp_library', '') != drupal_get_path('module', 'maillog') . '/includes/maillog.inc') {
       $requirements[] = array(
