@@ -1,4 +1,3 @@
-// $Id$
 
 This module defines drupal_mail_wrapper(), which takes over the handling of mail sending. This wrapper creates a node of type 'Logged Mail', a node type created by the module, sends the e-mail, and displays the e-mail and its details by using devel module API. All 3 tasks can be enabled/disabled from 'admin/settings/maillog'.
 

@@ -1,4 +1,3 @@
-; $Id$
 name = Mail Log
 description = Creates a content type 'Logged Mail', a view 'Logged Mails' and logs all outgoing e-mails in nodes.
 dependencies[] = views
