@@ -1,18 +1,14 @@
-<<<<<<< HEAD
-<?php 
-=======
 <?php
->>>>>>> fdef2af7a665e2286fac94bc6ae60955a674b14f
 
 /**
  * @file
  * Handler for providing an 'Delete link' in views
  */
 
-class maillog_handler_field_maillog_entry_link_delete extends views_handler_field {
+class maillog_handler_field_maillog_link_delete extends views_handler_field {
   function construct() {
     parent::construct();
-    $this->additional_fields['maillog_id'] = 'maillog_id';
+    $this->additional_fields['idmaillog'] = 'idmaillog';
   }
 
   /**
@@ -29,7 +25,7 @@ class maillog_handler_field_maillog_entry_link_delete extends views_handler_fiel
       return;
     }
     $text = !empty($this->options['text']) ? $this->options['text'] : t('delete');
-    return l($text, "maillog/delete/$values->maillog_id", array('query' => drupal_get_destination()));
+    return l($text, "maillog/delete/$values->idmaillog", array('query' => drupal_get_destination()));
   }
 }
 

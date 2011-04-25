@@ -9,16 +9,16 @@
  * Implementation of hook_views_data().
  */
 function maillog_views_data() {
-  $data['maillog']['table']['group'] = t('Mail Log');
+  $data['maillog']['table']['group'] = t('Maillog');
 
   $data['maillog']['table']['base'] = array(
-    'field' => 'maillog_id',
-    'title' => t('Mail Log'),
+    'field' => 'idmaillog',
+    'title' => t('Maillog'),
     'help' => t("This table contains the logged e-mails."),
     'weight' => -10,
   );
 
-  $data['maillog']['maillog_id'] = array(
+  $data['maillog']['idmaillog'] = array(
     'title' => t('Maillog_ID'),
     'help' => t('The primary key of the maillog table.'),
     'field' => array(
@@ -35,7 +35,7 @@ function maillog_views_data() {
       'handler' => 'views_handler_argument_string',
     ),
   );
-  
+
   $data['maillog']['header_message_id'] = array(
     'title' => t('Message_ID'),
     'help' => t("The 'Message_ID' e-mail address."),
@@ -53,7 +53,7 @@ function maillog_views_data() {
       'handler' => 'views_handler_argument_string',
     ),
   );
-  
+
   $data['maillog']['header_from'] = array(
     'title' => t('From'),
     'help' => t("The 'From' field of the e-mail address."),
@@ -179,12 +179,12 @@ function maillog_views_data() {
       'handler' => 'views_handler_argument_string',
     ),
   );
-  
-  $data['maillog']['delete_maillog_entry'] = array(
+
+  $data['maillog']['delete_maillog'] = array(
     'field' => array(
       'title' => t('Delete link'),
       'help' => t('Provide a simple link to delete an eMail entry from the maillog table.'),
-      'handler' => 'maillog_handler_field_maillog_entry_link_delete',
+      'handler' => 'maillog_handler_field_maillog_link_delete',
     ),
   );
   return $data;
@@ -201,7 +201,7 @@ function maillog_views_handlers() {
     ),
     'handlers' => array(
       // field handlers
-      'maillog_handler_field_maillog_entry_link_delete' => array(
+      'maillog_handler_field_maillog_link_delete' => array(
         'parent' => 'views_handler_field',
       ),
     ),
