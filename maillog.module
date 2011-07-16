@@ -19,7 +19,7 @@
 /**
  * Implementation of hook_permision().
  */
-function maillog_permisson() {
+function maillog_permission() {
   return array('view maillog' => array(
      'title' => t('View Maillog'),
      'description' => t('Allow users to view a list of recently logged mails.'),
@@ -95,12 +95,14 @@ function maillog_maillog_title($maillog) {
  *
  */
 function maillog_maillog_load($idmaillog) {
-  $result = db_query("SELECT idmaillog, header_from, header_to, header_reply_to, header_all, subject, body FROM {maillog} WHERE idmaillog = '%d'", $idmaillog );
+  $result = db_query("SELECT idmaillog, header_from, header_to, header_reply_to, header_all, subject, body FROM {maillog} WHERE idmaillog=:id", array(
+    ':id' => $idmaillog,
+  ));
   if ($result == FALSE) {
     $maillog = NULL;
   }
   else {
-    $maillog = db_fetch_array($result);
+    $maillog = $result->fetchAssoc();
     // unserialize values
     $maillog['header_all'] = unserialize($maillog['header_all']);
   }
@@ -111,7 +113,7 @@ function maillog_maillog_load($idmaillog) {
  *
  */
 function maillog_maillog_page($maillog) {
-  return theme('maillog', $maillog);
+  return theme('maillog', array('maillog' => $maillog));
 }
 
 /**
@@ -166,24 +168,36 @@ function maillog_views_api() {
  */
 function maillog_theme() {
   return array(
-    'maillog_header_from' => array('arguments' => array('header_from')),
-    'maillog_header_to' => array('arguments' => array('header_to')),
-    'maillog_header_reply_to' => array('arguments' => array('header_reply_to')),
-    'maillog_header_all' => array('arguments' => array('header_all')),
-    'maillog_body' => array('arguments' => array('body')),
-    'maillog' => array('arguments' => array('maillog')),
+    'maillog_header_from' => array(
+      'variables' => array('header_from' => NULL),
+    ),
+    'maillog_header_to' => array(
+      'variables' => array('header_to' => NULL),
+    ),
+    'maillog_header_reply_to' => array(
+      'variables' => array('header_reply_to' => NULL),
+    ),
+    'maillog_header_all' => array(
+      'variables' => array('header_all' => NULL),
+    ),
+    'maillog_body' => array(
+      'variables' => array('body' => NULL),
+    ),
+    'maillog' => array(
+      'variables' => array('maillog' => NULL),
+    ),
   );
 }
 
 /**
  * Render the 'From' field in the node type 'Logged Mail'
  */
-function theme_maillog_header_from($header_from) {
+function theme_maillog_header_from($variables) {
   $output = '';
 
   $output .= '<div class="field mail-log-header-from">';
   $output .= '<div class="field-label">' . t('From') . ':</div>';
-  $output .= '<div class="field-item">' . check_plain($header_from) . '</div>';
+  $output .= '<div class="field-item">' . check_plain($variables['header_from']) . '</div>';
   $output .= '</div>';
 
   return $output;
@@ -192,12 +206,12 @@ function theme_maillog_header_from($header_from) {
 /**
  *
  */
-function theme_maillog($maillog) {
-  $output = theme( 'maillog_header_from', $maillog['header_from'] );
-  $output .= theme( 'maillog_header_to', $maillog['header_to'] );
-  $output .= theme( 'maillog_header_reply_to', $maillog['header_reply_to'] );
-  $output .= theme( 'maillog_header_all', $maillog['header_all'] );
-  $output .= theme( 'maillog_body', $maillog['body'] );
+function theme_maillog($variables) {
+  $output = theme( 'maillog_header_from', array('header_from' => $variables['maillog']['header_from']) );
+  $output .= theme( 'maillog_header_to', array('header_to' => $variables['maillog']['header_to']) );
+  $output .= theme( 'maillog_header_reply_to', array('header_reply_to' => $variables['maillog']['header_reply_to']) );
+  $output .= theme( 'maillog_header_all', array('header_all' => $variables['maillog']['header_all']) );
+  $output .= theme( 'maillog_body', array('body' => $variables['maillog']['body']) );
   return $output;
 }
 
@@ -205,12 +219,12 @@ function theme_maillog($maillog) {
 /**
  * Render the 'To' field in the node type 'Logged Mail'
  */
-function theme_maillog_header_to($header_to) {
+function theme_maillog_header_to($variables) {
   $output = '';
 
   $output .= '<div class="field mail-log-header-to">';
   $output .= '<div class="field-label">' . t('To') . ':</div>';
-  $output .= '<div class="field-item">' . check_plain($header_to) . '</div>';
+  $output .= '<div class="field-item">' . check_plain($variables['header_to']) . '</div>';
   $output .= '</div>';
 
   return $output;
@@ -219,12 +233,12 @@ function theme_maillog_header_to($header_to) {
 /**
  * Render the 'Reply-To' field in the node type 'Logged Mail'
  */
-function theme_maillog_header_reply_to($header_reply_to) {
+function theme_maillog_header_reply_to($variables) {
   $output = '';
 
   $output .= '<div class="field mail-log-header-reply-to">';
   $output .= '<div class="field-label">' . t('Reply To') . ':</div>';
-  $output .= '<div class="field-item">' . check_plain($header_reply_to) . '</div>';
+  $output .= '<div class="field-item">' . check_plain($variables['header_reply_to']) . '</div>';
   $output .= '</div>';
 
   return $output;
@@ -233,14 +247,14 @@ function theme_maillog_header_reply_to($header_reply_to) {
 /**
  * Render the 'Header' field in the node type 'Logged Mail'
  */
-function theme_maillog_header_all($header_all) {
+function theme_maillog_header_all($variables) {
   $output = '';
 
   $output .= '<div class="field mail-log-header-all">';
   $output .= '<div class="field-label">' . t('Header') . ':</div>';
   $output .= '<div class="field-item">';
 
-  foreach ($header_all as $header_all_name => $header_all_value) {
+  foreach ($variables['header_all'] as $header_all_name => $header_all_value) {
     $output .= '<div class="mail-log-header-all-subitem">';
     $output .= check_plain($header_all_name) . ': ' . check_plain($header_all_value);
     $output .= '</div>';
@@ -255,14 +269,14 @@ function theme_maillog_header_all($header_all) {
 /**
  * Render the 'Body' field in the node type 'Logged Mail'
  */
-function theme_maillog_body($body) {
+function theme_maillog_body($variables) {
   $output = '';
 
   $output .= '<div class="field mail-log-body">';
   $output .= '<div class="field-label">' . t('Body') . ':</div>';
   $output .= '<div class="field-item">';
   $output .= '<pre>';
-  $output .= check_plain($body);
+  $output .= check_plain($variables['body']);
   $output .= '</pre>';
   $output .=  '</div>';
   $output .= '</div>';
