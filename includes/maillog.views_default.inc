@@ -228,7 +228,7 @@ $handler->override_option('menu', array(
   'title' => 'Maillog',
   'description' => 'Show the logged mails',
   'weight' => '0',
-  'name' => 'navigation',
+  'name' => 'management',
 ));
 $handler->override_option('tab_options', array(
   'type' => 'none',
