@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 <?php 
-=======
-<?php
->>>>>>> fdef2af7a665e2286fac94bc6ae60955a674b14f
 
 /**
  * @file
