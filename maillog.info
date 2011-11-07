@@ -7,12 +7,7 @@ dependencies[] = views
 
 configure = admin/config/development/maillog
 
-files[] = maillog.module
-files[] = maillog.install
-files[] = maillog.info
 files[] = includes/maillog.mail.inc
-files[] = includes/maillog.views.inc  
-files[] = includes/maillog.views_default.inc
-files[] = maillog_handler_field_maillog_entry_link_delete.inc
-files[] = maillog_handler_field_maillog_link_delete.inc
+files[] = includes/maillog_handler_field_maillog_entry_link_delete.inc
+files[] = includes/maillog_handler_field_maillog_link_delete.inc
 

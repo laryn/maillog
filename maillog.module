@@ -35,17 +35,16 @@ function maillog_permission() {
   );
 }
 
-function maillog_maillog_delete( $maillog ) {
+function maillog_maillog_delete($maillog) {
   $idmaillog = $maillog['idmaillog'];
-  $result = db_query("DELETE FROM {maillog} WHERE `idmaillog` = '%d'", $idmaillog);
+  $result = db_query("DELETE FROM {maillog} WHERE idmaillog = :id", array(':id' => $idmaillog));
   if ($result == FALSE) {
     drupal_set_message(t('A Problem occured when deleting Mail with idmaillog !idmaillog !', array('!idmaillog' => $idmaillog)));
   }
   else {
     drupal_set_message(t('Mail with idmaillog !idmaillog has been deleted!', array('!idmaillog' => $idmaillog)));
   }
-  drupal_goto('maillog/log');
-  return '';
+  drupal_goto('admin/reports/maillog');
 }
 
 /**
