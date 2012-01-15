@@ -7,7 +7,5 @@ dependencies[] = views
 
 configure = admin/config/development/maillog
 
-files[] = includes/maillog.mail.inc
 files[] = includes/maillog_handler_field_maillog_entry_link_delete.inc
 files[] = includes/maillog_handler_field_maillog_link_delete.inc
-
