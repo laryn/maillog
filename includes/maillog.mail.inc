@@ -53,6 +53,14 @@ class MaillogMailSystem implements MailSystemInterface {
       $record->body = $message['body'];
       $record->header_from = isset($message['from']) ? $message['from'] : NULL;
       $record->header_to = isset($message['to']) ? $message['to'] : NULL;
+      $record->header_to = NULL;
+      if (isset($message['to'])) {
+        $header_to = $message['to'];
+        if (is_array($header_to)) {
+          $header_to = implode(', ', $header_to);
+        }
+        $record->header_to = $header_to;
+      }
       $record->header_reply_to = isset($message['headers']['Reply-To']) ? $message['headers']['Reply-To'] : '';
       $record->header_all = serialize($message['headers']);
       $record->sent_date = REQUEST_TIME;
