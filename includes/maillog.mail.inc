@@ -48,19 +48,27 @@ class MaillogMailSystem implements MailSystemInterface {
     if (variable_get('maillog_log', TRUE)) {
       $record = new stdClass;
 
+      // In case the subject/from/to is already encoded, decode with mime_header_decode
       $record->header_message_id = isset($message['headers']['Message-ID']) ? $message['headers']['Message-ID'] : NULL;
       $record->subject = $message['subject'];
+      $record->subject = mime_header_decode($record->subject);
       $record->body = $message['body'];
       $record->header_from = isset($message['from']) ? $message['from'] : NULL;
-      $record->header_to = isset($message['to']) ? $message['to'] : NULL;
-      $record->header_to = NULL;
+      $record->header_from = mime_header_decode($record->header_from);
+
+      $header_to = array();
       if (isset($message['to'])) {
-        $header_to = $message['to'];
-        if (is_array($header_to)) {
-          $header_to = implode(', ', $header_to);
+        if (is_array($message['to'])) {
+          foreach($message['to'] as $value) {
+            $header_to[] = mime_header_decode($value);
+          }
         }
-        $record->header_to = $header_to;
+        else {
+          $header_to[] = mime_header_decode($message['to']);
+        }
       }
+      $record->header_to = implode(', ', $header_to);
+
       $record->header_reply_to = isset($message['headers']['Reply-To']) ? $message['headers']['Reply-To'] : '';
       $record->header_all = serialize($message['headers']);
       $record->sent_date = REQUEST_TIME;
@@ -92,10 +100,8 @@ class MaillogMailSystem implements MailSystemInterface {
     }
     else {
       global $user;
-      $message = t('User @user attempted to send an email, but sending emails is disabled.');
-      watchdog('maillog', $message, array('@user' => $user->name));
+      watchdog('maillog', 'Attempted to send an email, but sending emails is disabled.');
     }
     return isset($result) ? $result : TRUE;
   }
-
 }
