@@ -64,10 +64,29 @@ function maillog_views_default_views() {
   $handler->display->display_options['fields']['header_to']['id'] = 'header_to';
   $handler->display->display_options['fields']['header_to']['table'] = 'maillog';
   $handler->display->display_options['fields']['header_to']['field'] = 'header_to';
+  /* Field: Global: Custom text */
+  $handler->display->display_options['fields']['nothing']['id'] = 'nothing';
+  $handler->display->display_options['fields']['nothing']['table'] = 'views';
+  $handler->display->display_options['fields']['nothing']['field'] = 'nothing';
+  $handler->display->display_options['fields']['nothing']['label'] = '';
+  $handler->display->display_options['fields']['nothing']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['nothing']['alter']['text'] = 'view';
+  $handler->display->display_options['fields']['nothing']['alter']['make_link'] = TRUE;
+  $handler->display->display_options['fields']['nothing']['alter']['path'] = 'maillog/details/[idmaillog]';
+  $handler->display->display_options['fields']['nothing']['element_label_colon'] = FALSE;
   /* Field: Maillog: Delete link */
   $handler->display->display_options['fields']['delete_maillog']['id'] = 'delete_maillog';
   $handler->display->display_options['fields']['delete_maillog']['table'] = 'maillog';
   $handler->display->display_options['fields']['delete_maillog']['field'] = 'delete_maillog';
+  $handler->display->display_options['fields']['delete_maillog']['label'] = '';
+  $handler->display->display_options['fields']['delete_maillog']['exclude'] = TRUE;
+  $handler->display->display_options['fields']['delete_maillog']['element_label_colon'] = FALSE;
+  /* Field: Global: Custom text */
+  $handler->display->display_options['fields']['nothing_1']['id'] = 'nothing_1';
+  $handler->display->display_options['fields']['nothing_1']['table'] = 'views';
+  $handler->display->display_options['fields']['nothing_1']['field'] = 'nothing';
+  $handler->display->display_options['fields']['nothing_1']['label'] = 'Actions';
+  $handler->display->display_options['fields']['nothing_1']['alter']['text'] = '[nothing] | [delete_maillog]';
   /* Sort criterion: Maillog: Date */
   $handler->display->display_options['sorts']['sent_date']['id'] = 'sent_date';
   $handler->display->display_options['sorts']['sent_date']['table'] = 'maillog';
@@ -98,7 +117,9 @@ function maillog_views_default_views() {
     t('Subject'),
     t('From'),
     t('To'),
-    t('Delete link'),
+    t('view'),
+    t('Actions'),
+    t('[nothing] | [delete_maillog]'),
     t('Page'),
   );
 
