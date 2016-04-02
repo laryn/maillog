@@ -1,0 +1,5 @@
+name = Maillog tests
+description = Contains helper logic for the Maillog tests.
+package = Mail
+core = 7.x
+hidden = TRUE

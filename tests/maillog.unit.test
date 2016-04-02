@@ -1,0 +1,105 @@
+<?php
+/**
+ * @file
+ * Unit-ish tests for the Maillog module.
+ */
+
+class MaillogUnitTest extends DrupalWebTestCase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function getInfo() {
+    return array(
+      'name' => 'Maillog unit tests',
+      'description' => 'Test the main Maillog functionality.',
+      'group' => 'Maillog',
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function setUp(array $modules = array()) {
+    // Requirements.
+    $modules[] = 'maillog';
+
+    // Some extra logic for fully testing the module.
+    $modules[] = 'maillog_tests';
+
+    parent::setUp($modules);
+
+    // Take over the email system.
+    variable_set('mail_system', array('default-system' => 'MaillogMailSystem'));
+
+    // Don't allow emails to be delivered.
+    variable_set('maillog_send', FALSE);
+
+    // Log all emails.
+    variable_set('maillog_log', TRUE);
+  }
+
+  /**
+   * Confirm that SimpleTest has taken over the 'mail_system' variable.
+   */
+  function testSetup() {
+    $enabled = variable_get('mail_system', array());
+    $should_be = array(
+      'default-system' => 'MaillogMailSystem',
+    );
+    $this->assertEqual($enabled, $should_be, 'Maillog is controlling mail delivery.');
+
+    $delivery = variable_get('maillog_send', FALSE);
+    $this->assertEqual($delivery, FALSE, 'Email delivery is disabled.');
+
+    $logging = variable_get('maillog_log', TRUE);
+    $this->assertEqual($logging, TRUE, 'Email delivery is being logged.');
+  }
+
+  /**
+   * Tests logging mail with maillog module.
+   */
+  public function testLogging() {
+    $langcode = language_default('language');
+
+    // This is automatically assigned by Simpletest.
+    $sender = 'simpletest@example.com';
+
+    // Send an email.
+    $from_email = 'from_test@example.com';
+    $to_email = 'to_test@example.com';
+    $reply_email = 'reply_test@example.com';
+    $params = array();
+    drupal_mail('maillog_tests', 'maillog_basic_test', $to_email, $langcode, $params, $from_email);
+
+    // Compare the maillog db entry with the sent mail.
+    $logged_email = $this->getLatestMaillogEntry();
+    $this->assertTrue(!empty($logged_email), 'The test email was captured.');
+    $this->assertEqual($to_email, $logged_email['header_to'], 'Email "to" address is correct.');
+    $this->assertEqual($from_email, $logged_email['header_from'], 'Email "from" address is correct.');
+    $this->assertEqual($from_email, $logged_email['header_all']['From'], 'Email "from" header is correct.');
+    $this->assertEqual($sender, $logged_email['header_all']['Sender'], 'Email "sender" header is correct.');
+    $this->assertEqual($sender, $logged_email['header_all']['Return-Path'], 'Email "return-path" header is correct.');
+    $this->assertEqual('Drupal', $logged_email['header_all']['X-Mailer'], 'Email "x-mailer" header is correct.');
+    $this->assertEqual(t('Test email subject'), $logged_email['subject'], 'Email subject is correct.');
+    $this->assertEqual(t('Test email body.') . "\n", $logged_email['body'], 'Email body is correct.');
+  }
+
+  /**
+   * Gets the latest Maillog entry.
+   *
+   * @return array
+   *   Maillog entry.
+   */
+  protected function getLatestMaillogEntry() {
+    $query = 'SELECT idmaillog, header_from, header_to, header_reply_to, header_all, subject, body FROM {maillog} ORDER BY idmaillog DESC';
+    $result = db_query_range($query, 0, 1);
+
+    if ($maillog = $result->fetchAssoc()) {
+      // Unserialize values.
+      $maillog['header_all'] = unserialize($maillog['header_all']);
+    }
+    return $maillog;
+  }
+
+}
