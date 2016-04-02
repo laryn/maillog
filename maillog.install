@@ -13,6 +13,15 @@ function maillog_enable() {
   $mail_system['maillog'] = 'MaillogMailSystem';
   $mail_system['default-system'] = $mail_system['maillog'];
   variable_set('mail_system', $mail_system);
+
+  // The maillog reports page is provided by a view, but it needs a menu cache
+  // clear after the default views are loaded in order for the menu item to
+  // become active.
+  global $language;
+  cache_clear_all('ctools_plugin_files:ctools:export_ui', 'cache');
+  cache_clear_all('ctools_plugin_type_info', 'cache');
+  cache_clear_all('views:plugin_data:' . $language->language, 'cache');
+  variable_set('menu_rebuild_needed', TRUE);
 }
 
 /**
