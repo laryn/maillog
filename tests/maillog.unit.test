@@ -102,4 +102,30 @@ class MaillogUnitTest extends DrupalWebTestCase {
     return $maillog;
   }
 
+  /**
+   * Confirm what happens with long subject lines.
+   */
+  public function testLongSubject() {
+    $langcode = language_default('language');
+
+    // Send an email.
+    $from_email = 'from_test@example.com';
+    $to_email = 'to_test@example.com';
+    $params = array();
+    drupal_mail('maillog_tests', 'maillog_long_subject_test', $to_email, $langcode, $params, $from_email);
+
+    // Compare the maillog db entry with the sent mail.
+    $logged_email = $this->getLatestMaillogEntry();
+    $this->assertTrue(!empty($logged_email), 'The test email was captured.');
+
+    // The original subject line, as copied from maillog_tests_mail().
+    $subject = str_repeat(t('Test email subject') . ' ', 20);
+
+    // Duplicate the string trimming.
+    $subject_trimmed = drupal_substr($subject, 0, 255);
+
+    $this->assertEqual($subject_trimmed, $logged_email['subject'], 'Email subject was trimmed correctly.');
+    $this->assertNotEqual($subject, $logged_email['subject'], 'Email subject is not untrimmed.');
+  }
+
 }

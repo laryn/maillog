@@ -53,6 +53,7 @@ class MaillogMailSystem implements MailSystemInterface {
       $record->header_message_id = isset($message['headers']['Message-ID']) ? $message['headers']['Message-ID'] : NULL;
       $record->subject = $message['subject'];
       $record->subject = mime_header_decode($record->subject);
+      $record->subject = drupal_substr($record->subject, 0, 255);
       $record->body = $message['body'];
       $record->header_from = isset($message['from']) ? $message['from'] : NULL;
       $record->header_from = mime_header_decode($record->header_from);
