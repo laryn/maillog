@@ -39,10 +39,10 @@ function maillog_maillog_delete($maillog) {
   $idmaillog = $maillog['idmaillog'];
   $result = db_query("DELETE FROM {maillog} WHERE idmaillog = :id", array(':id' => $idmaillog));
   if ($result == FALSE) {
-    drupal_set_message(t('A Problem occured when deleting Mail with idmaillog !idmaillog !', array('!idmaillog' => $idmaillog)));
+    drupal_set_message(t('A Problem occured when deleting Mail with ID !idmaillog !', array('!idmaillog' => $idmaillog)));
   }
   else {
-    drupal_set_message(t('Mail with idmaillog !idmaillog has been deleted!', array('!idmaillog' => $idmaillog)));
+    drupal_set_message(t('Mail with ID !idmaillog has been deleted!', array('!idmaillog' => $idmaillog)));
   }
   drupal_goto('admin/reports/maillog');
 }
@@ -64,7 +64,7 @@ function maillog_menu() {
 
   $items['maillog/delete/%maillog_maillog'] = array(
     'title' => t("Delete Maillog from 'maillog' Table"),
-    'description' => t("Delete the Maillog with the idmaillog given by the parameter from 'maillog' Table"),
+    'description' => t("Delete the Maillog with the ID given by the parameter from 'maillog' Table"),
     'page callback' => 'maillog_maillog_delete',
     'page arguments' => array(2),
     'access arguments' => array('delete maillog'),
@@ -73,7 +73,7 @@ function maillog_menu() {
   $items['maillog/details/%maillog_maillog'] = array(
     'title callback' => 'maillog_maillog_title',
     'title arguments' => array(2),
-    'description' => t("Delete the Maillog with the idmaillog given by the parameter from 'maillog' Table"),
+    'description' => t("Delete the Maillog with the ID given by the parameter from 'maillog' Table"),
     'page callback' => 'maillog_maillog_page',
     'page arguments' => array(2),
     'access arguments' => array('view maillog'),
