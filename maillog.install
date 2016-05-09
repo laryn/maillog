@@ -21,7 +21,7 @@ function maillog_enable() {
     $mail_system['default-system'] = $mail_system['maillog'];
   }
   else {
-    drupal_set_message(t('The Maillog module was not set as the default log system because another module is already handling email.'));
+    drupal_set_message(t('The Maillog module was not set as the default email system because another module is already handling email.'));
   }
 
   // Update the settings.
