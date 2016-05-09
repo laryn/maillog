@@ -9,9 +9,22 @@
  * Implementation of hook_enable().
  */
 function maillog_enable() {
-  $mail_system = variable_get('mail_system', array('default-system' => 'DefaultMailSystem'));
+  // The system default class.
+  $default_class = 'DefaultMailSystem';
+
+  // Load the current mail configuration.
+  $mail_system = variable_get('mail_system', array('default-system' => $default_class));
   $mail_system['maillog'] = 'MaillogMailSystem';
-  $mail_system['default-system'] = $mail_system['maillog'];
+
+  // If maillog is enabled, don't take over the default
+  if ($mail_system['default-system'] != $default_class) {
+    $mail_system['default-system'] = $mail_system['maillog'];
+  }
+  else {
+    drupal_set_message(t('The Maillog module was not set as the default log system because another module is already handling email.'));
+  }
+
+  // Update the settings.
   variable_set('mail_system', $mail_system);
 
   // The maillog reports page is provided by a view, but it needs a menu cache
@@ -26,16 +39,36 @@ function maillog_enable() {
 
 /**
  * Implementation of hook_disable().
- *
- * Removing smtp_libraries settings.
- *
- * If the smptp_library variable refers to the maillog_smtp_library the variable will be resetted. It does not make sense to backup the smtp_library
- * when enabling the maillog module, because before restoring when the maillog module gets disabled another module could changed the smtp variable.
  */
 function maillog_disable() {
+  // Get the current mail system config.
   $mail_system = variable_get('mail_system', array('default-system' => 'DefaultMailSystem'));
+
+  // Delete any overrides that might be set for Maillog.
   unset($mail_system['maillog']);
-  $mail_system['default-system'] = 'DefaultMailSystem';
+
+  // Revert the default config mail config if it is currently set to use
+  // Maillog, and any others that are set to Maillog can be just deleted so they
+  // revert to the default.
+  $default_class = 'DefaultMailSystem';
+  $maillog_class = 'MaillogMailSystem';
+  foreach ($mail_system as $system => $class) {
+    // Look for the default mail handler.
+    if ($system == 'default-system') {
+      // If this is currently using Maillog, revert it to the default class.
+      if ($class == $maillog_class) {
+        $mail_system[$system] = $default_class;
+      }
+    }
+
+    // For all other mail handlers, just delete them if they're set to Maillog
+    // so that the system default handler is used instead.
+    elseif ($class == $maillog_class) {
+      unset($mail_system[$system]);
+    }
+  }
+
+  // Update the mail config.
   variable_set('mail_system', $mail_system);
 }
 
