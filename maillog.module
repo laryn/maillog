@@ -20,31 +20,20 @@
  * Implementation of hook_permision().
  */
 function maillog_permission() {
-  return array('view maillog' => array(
-     'title' => t('View Maillog'),
-     'description' => t('Allow users to view a list of recently logged mails.'),
-  ),
- 'delete maillog' => array(
-     'title' => t('Delete Entries from the log'),
-     'description' => t('Allow users to delete logged mails.'),
-  ),
+  return array(
+    'view maillog' => array(
+      'title' => t('View Maillog'),
+      'description' => t('Allow users to view a list of recently logged mails.'),
+    ),
+    'delete maillog' => array(
+      'title' => t('Delete Entries from the log'),
+      'description' => t('Allow users to delete logged mails.'),
+    ),
     'administer maillog' => array(
-     'title' => t('Administer Maillog'),
-     'description' => t('Allow users to change maillog seetings.'),
-  )
+      'title' => t('Administer Maillog'),
+      'description' => t('Allow users to change maillog seetings.'),
+    ),
   );
-}
-
-function maillog_maillog_delete($maillog) {
-  $idmaillog = $maillog['idmaillog'];
-  $result = db_query("DELETE FROM {maillog} WHERE idmaillog = :id", array(':id' => $idmaillog));
-  if ($result == FALSE) {
-    drupal_set_message(t('A Problem occured when deleting Mail with ID !idmaillog !', array('!idmaillog' => $idmaillog)));
-  }
-  else {
-    drupal_set_message(t('Mail with ID !idmaillog has been deleted!', array('!idmaillog' => $idmaillog)));
-  }
-  drupal_goto('admin/reports/maillog');
 }
 
 /**
@@ -84,14 +73,25 @@ function maillog_menu() {
 }
 
 /**
+ * Title callback for a maillog record.
  *
+ * @param array $maillog
+ *   A maillog record that is to be deleted with an 'idmaillog' value.
+ *
+ * @return string
  */
 function maillog_maillog_title($maillog) {
   return $maillog['subject'];
 }
 
 /**
+ * Load a maillog record.
  *
+ * @param int $idmaillog
+ *   The primary ID for a maillog record.
+ *
+ * @return null|array
+ *   An array containing the {maillog} record if found, NULL if not.
  */
 function maillog_maillog_load($idmaillog) {
   $result = db_query("SELECT idmaillog, header_from, header_to, header_reply_to, header_all, subject, body FROM {maillog} WHERE idmaillog=:id", array(
@@ -109,7 +109,30 @@ function maillog_maillog_load($idmaillog) {
 }
 
 /**
+ * Delete a maillog record.
  *
+ * @param array $maillog
+ *   A maillog record that is to be deleted with an 'idmaillog' value.
+ */
+function maillog_maillog_delete($maillog) {
+  $idmaillog = $maillog['idmaillog'];
+  $result = db_query("DELETE FROM {maillog} WHERE idmaillog = :id", array(':id' => $idmaillog));
+  if ($result == FALSE) {
+    drupal_set_message(t('A Problem occured when deleting Mail with ID !idmaillog !', array('!idmaillog' => $idmaillog)));
+  }
+  else {
+    drupal_set_message(t('Mail with ID !idmaillog has been deleted!', array('!idmaillog' => $idmaillog)));
+  }
+  drupal_goto('admin/reports/maillog');
+}
+
+/**
+ * Display a maillog record.
+ *
+ * @param array $maillog
+ *   A maillog record that is to be deleted with an 'idmaillog' value.
+ *
+ * @return string
  */
 function maillog_maillog_page($maillog) {
   return theme('maillog', array('maillog' => $maillog));
@@ -138,6 +161,7 @@ function maillog_admin_settings() {
     '#title' => t("Display the e-mails on page using devel module (if enabled)."),
     '#default_value' => variable_get('maillog_devel', TRUE),
   );
+
   if (module_exists('mailsystem')) {
     $mailsystem_classes = mailsystem_get_classes();
     // maillog will be unset, because ist would cause an recursion
@@ -149,6 +173,7 @@ function maillog_admin_settings() {
       '#options' => $mailsystem_classes,
     );
   }
+
   return system_settings_form($form);
 }
 
@@ -189,6 +214,21 @@ function maillog_theme() {
 }
 
 /**
+ * Render a maillog record.
+ */
+function theme_maillog($variables) {
+  $output = '';
+
+  $output .= theme('maillog_header_from', array('header_from' => $variables['maillog']['header_from']));
+  $output .= theme('maillog_header_to', array('header_to' => $variables['maillog']['header_to']));
+  $output .= theme('maillog_header_reply_to', array('header_reply_to' => $variables['maillog']['header_reply_to']));
+  $output .= theme('maillog_header_all', array('header_all' => $variables['maillog']['header_all']));
+  $output .= theme('maillog_body', array('body' => $variables['maillog']['body']));
+
+  return $output;
+}
+
+/**
  * Render the 'From' field in the node type 'Logged Mail'
  */
 function theme_maillog_header_from($variables) {
@@ -201,19 +241,6 @@ function theme_maillog_header_from($variables) {
 
   return $output;
 }
-
-/**
- *
- */
-function theme_maillog($variables) {
-  $output = theme( 'maillog_header_from', array('header_from' => $variables['maillog']['header_from']) );
-  $output .= theme( 'maillog_header_to', array('header_to' => $variables['maillog']['header_to']) );
-  $output .= theme( 'maillog_header_reply_to', array('header_reply_to' => $variables['maillog']['header_reply_to']) );
-  $output .= theme( 'maillog_header_all', array('header_all' => $variables['maillog']['header_all']) );
-  $output .= theme( 'maillog_body', array('body' => $variables['maillog']['body']) );
-  return $output;
-}
-
 
 /**
  * Render the 'To' field in the node type 'Logged Mail'
