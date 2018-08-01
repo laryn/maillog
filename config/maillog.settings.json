@@ -1,0 +1,7 @@
+{
+    "_config_name": "maillog.settings",
+    "maillog_send": 1,
+    "maillog_log": 1,
+    "maillog_devel": 1,
+    "maillog_engine": "DefaultMailSystem"
+}

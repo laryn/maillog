@@ -12,9 +12,31 @@
  * Please install mimemail to make the outgoing engine pluggable.
  *
  * mail flow:
- * drupal_mail -> maillog:drupal_mail_wrapper -> maillog_mail_send
+ * backdrop_mail -> maillog:backdrop_mail_wrapper -> maillog_mail_send
  * mimemail -> maillog_mailengine -> maillog_mail_send [-> ANY_engine]
  */
+
+/**
+ * Implements hook_config_info().
+ */
+function maillog_config_info() {
+  $prefixes['maillog.settings'] = array(
+    'label' => t('Maillog settings'),
+    'group' => t('Configuration'),
+  );
+  return $prefixes;
+}
+
+/**
+ * Implements hook_autoload_info().
+ */
+function maillog_autoload_info() {
+  return array(
+    'MaillogMailSystem' => 'includes/maillog.mail.inc',
+    'maillog_handler_field_maillog_entry_link_delete' => 'includes/maillog_handler_field_maillog_entry_link_delete.inc',
+    'maillog_handler_field_maillog_link_delete' => 'includes/maillog_handler_field_maillog_link_delete.inc',
+  );
+}
 
 /**
  * Implementation of hook_permision().
@@ -45,7 +67,7 @@ function maillog_menu() {
   $items['admin/config/development/maillog'] = array(
     'title' => t('Maillog Settings'),
     'description' => t('Configure the settings of Maillog module.'),
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('maillog_admin_settings'),
     'access arguments' => array('administer maillog'),
     'type' => MENU_NORMAL_ITEM,
@@ -118,12 +140,12 @@ function maillog_maillog_delete($maillog) {
   $idmaillog = $maillog['idmaillog'];
   $result = db_query("DELETE FROM {maillog} WHERE idmaillog = :id", array(':id' => $idmaillog));
   if ($result == FALSE) {
-    drupal_set_message(t('A Problem occured when deleting Mail with ID !idmaillog !', array('!idmaillog' => $idmaillog)));
+    backdrop_set_message(t('A Problem occured when deleting Mail with ID !idmaillog !', array('!idmaillog' => $idmaillog)));
   }
   else {
-    drupal_set_message(t('Mail with ID !idmaillog has been deleted!', array('!idmaillog' => $idmaillog)));
+    backdrop_set_message(t('Mail with ID !idmaillog has been deleted!', array('!idmaillog' => $idmaillog)));
   }
-  drupal_goto('admin/reports/maillog');
+  backdrop_goto('admin/reports/maillog');
 }
 
 /**
@@ -142,34 +164,36 @@ function maillog_maillog_page($maillog) {
  * Implementation of the module settings form.
  */
 function maillog_admin_settings() {
+  $config = config('maillog.settings');
   $form = array();
 
+  $form['#config'] = 'maillog.settings';
   $form['maillog_send'] = array(
     '#type' => 'checkbox',
     '#title' => t("Allow the e-mails to be sent."),
-    '#default_value' => variable_get('maillog_send', TRUE),
+    '#default_value' => $config->get('maillog_send'),
   );
 
   $form['maillog_log'] = array(
     '#type' => 'checkbox',
     '#title' => t("Create table entries in maillog table for each e-mail."),
-    '#default_value' => variable_get('maillog_log', TRUE),
+    '#default_value' => $config->get('maillog_log'),
   );
 
   $form['maillog_devel'] = array(
     '#type' => 'checkbox',
     '#title' => t("Display the e-mails on page using devel module (if enabled)."),
-    '#default_value' => variable_get('maillog_devel', TRUE),
+    '#default_value' => $config->get('maillog_devel'),
   );
 
   if (module_exists('mailsystem')) {
     $mailsystem_classes = mailsystem_get_classes();
-    // maillog will be unset, because ist would cause an recursion
+    // maillog will be unset, because it would cause an recursion
     unset($mailsystem_classes['MaillogMailSystem']);
     $form['maillog_engine'] = array(
       '#type' => 'select',
       '#title' => t("Select the mail system which should be used."),
-      '#default_value' => variable_get('maillog_engine', 'DefaultMailSystem'),
+      '#default_value' => $config->get('maillog_engine'),
       '#options' => $mailsystem_classes,
     );
   }
@@ -183,7 +207,7 @@ function maillog_admin_settings() {
 function maillog_views_api() {
   return array(
     'api' => 3,
-    'path' => drupal_get_path('module', 'maillog') . '/includes/',
+    'path' => backdrop_get_path('module', 'maillog') . '/includes/',
   );
 }
 

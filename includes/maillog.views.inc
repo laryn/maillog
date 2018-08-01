@@ -197,7 +197,7 @@ function maillog_views_data() {
 function maillog_views_handlers() {
   return array(
     'info' => array(
-      'path' => drupal_get_path('module', 'maillog') . '/includes',
+      'path' => backdrop_get_path('module', 'maillog') . '/includes',
     ),
     'handlers' => array(
       // field handlers
@@ -207,4 +207,3 @@ function maillog_views_handlers() {
     ),
   );
 }
-

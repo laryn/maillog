@@ -13,7 +13,7 @@ function maillog_enable() {
   $default_class = 'DefaultMailSystem';
 
   // Load the current mail configuration.
-  $mail_system = variable_get('mail_system', array('default-system' => $default_class));
+  $mail_system['default-system'] = config_get('system.mail', 'default-system');
   $mail_system['maillog'] = 'MaillogMailSystem';
 
   // If maillog is enabled, don't take over the default
@@ -21,11 +21,11 @@ function maillog_enable() {
     $mail_system['default-system'] = $mail_system['maillog'];
   }
   else {
-    drupal_set_message(t('The Maillog module was not set as the default email system because another module is already handling email.'));
+    backdrop_set_message(t('The Maillog module was not set as the default email system because another module is already handling email.'));
   }
 
   // Update the settings.
-  variable_set('mail_system', $mail_system);
+  config_set('system.mail', 'default-system', $mail_system['default-system']);
 
   // The maillog reports page is provided by a view, but it needs a menu cache
   // clear after the default views are loaded in order for the menu item to
@@ -33,8 +33,8 @@ function maillog_enable() {
   global $language;
   cache_clear_all('ctools_plugin_files:ctools:export_ui', 'cache');
   cache_clear_all('ctools_plugin_type_info', 'cache');
-  cache_clear_all('views:plugin_data:' . $language->language, 'cache');
-  variable_set('menu_rebuild_needed', TRUE);
+  cache_clear_all('views:plugin_data:' . $language->langcode, 'cache');
+  state_set('menu_rebuild_needed', TRUE);
 }
 
 /**
@@ -42,7 +42,8 @@ function maillog_enable() {
  */
 function maillog_disable() {
   // Get the current mail system config.
-  $mail_system = variable_get('mail_system', array('default-system' => 'DefaultMailSystem'));
+  $config = config('system.mail');
+  $mail_system = $config->get();
 
   // Delete any overrides that might be set for Maillog.
   unset($mail_system['maillog']);
@@ -69,7 +70,8 @@ function maillog_disable() {
   }
 
   // Update the mail config.
-  variable_set('mail_system', $mail_system);
+  $config->setData($mail_system);
+  $config->save();
 }
 
 /**
@@ -139,11 +141,22 @@ function maillog_schema() {
 }
 
 /**
- * Implements hook_uninstall().
+ * Update webforms from Drupal to Backdrop.
  */
-function maillog_uninstall() {
-  variable_del('maillog_devel');
-  variable_del('maillog_log');
-  variable_del('maillog_send');
-  variable_del('maillog_engine');
+function maillog_update_1000() {
+  $config = config('maillog.settings');
+
+  // migrate variables
+  $config->set('maillog_send', update_variable_get('maillog_send', TRUE));
+  $config->set('maillog_log', update_variable_get('maillog_log', TRUE));
+  $config->set('maillog_devel', update_variable_get('maillog_devel', TRUE));
+  $config->set('maillog_engine', update_variable_get('maillog_engine', 'DefaultMailSystem'));
+
+  $config->save();
+
+  // Delete variables.
+  update_variable_del('maillog_');
+  update_variable_del('maillog_');
+  update_variable_del('maillog_');
+  update_variable_del('maillog_');
 }

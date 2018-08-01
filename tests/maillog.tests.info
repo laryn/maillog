@@ -1,0 +1,5 @@
+[MaillogUnitTest]
+name = Maillog unit tests
+description = Test the main Maillog functionality.
+group = Maillog
+file = maillog.unit.test

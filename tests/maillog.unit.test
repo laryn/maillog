@@ -4,18 +4,7 @@
  * Unit-ish tests for the Maillog module.
  */
 
-class MaillogUnitTest extends DrupalWebTestCase {
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Maillog unit tests',
-      'description' => 'Test the main Maillog functionality.',
-      'group' => 'Maillog',
-    );
-  }
+class MaillogUnitTest extends BackdropWebTestCase {
 
   /**
    * {@inheritdoc}
@@ -30,29 +19,27 @@ class MaillogUnitTest extends DrupalWebTestCase {
     parent::setUp($modules);
 
     // Take over the email system.
-    variable_set('mail_system', array('default-system' => 'MaillogMailSystem'));
+    config_set('system.mail', 'default-system', 'MaillogMailSystem');
 
     // Don't allow emails to be delivered.
-    variable_set('maillog_send', FALSE);
+    config_set('maillog.settings', 'maillog_send', FALSE);
 
     // Log all emails.
-    variable_set('maillog_log', TRUE);
+    config_set('maillog.settings', 'maillog_log', TRUE);
   }
 
   /**
    * Confirm that SimpleTest has taken over the 'mail_system' variable.
    */
   function testSetup() {
-    $enabled = variable_get('mail_system', array());
-    $should_be = array(
-      'default-system' => 'MaillogMailSystem',
-    );
+    $enabled = config_get('system.mail', 'default-system');
+    $should_be = 'MaillogMailSystem';
     $this->assertEqual($enabled, $should_be, 'Maillog is controlling mail delivery.');
 
-    $delivery = variable_get('maillog_send', FALSE);
+    $delivery = config_get('maillog.settings', 'maillog_send');
     $this->assertEqual($delivery, FALSE, 'Email delivery is disabled.');
 
-    $logging = variable_get('maillog_log', TRUE);
+    $logging = config_get('maillog.settings', 'maillog_log');
     $this->assertEqual($logging, TRUE, 'Email delivery is being logged.');
   }
 
@@ -70,17 +57,18 @@ class MaillogUnitTest extends DrupalWebTestCase {
     $to_email = 'to_test@example.com';
     $reply_email = 'reply_test@example.com';
     $params = array();
-    drupal_mail('maillog_tests', 'maillog_basic_test', $to_email, $langcode, $params, $from_email);
+    backdrop_mail('maillog_tests', 'maillog_basic_test', $to_email, $langcode, $params, $from_email);
 
     // Compare the maillog db entry with the sent mail.
     $logged_email = $this->getLatestMaillogEntry();
     $this->assertTrue(!empty($logged_email), 'The test email was captured.');
     $this->assertEqual($to_email, $logged_email['header_to'], 'Email "to" address is correct.');
-    $this->assertEqual($from_email, $logged_email['header_from'], 'Email "from" address is correct.');
-    $this->assertEqual($from_email, $logged_email['header_all']['From'], 'Email "from" header is correct.');
+    $this->assertEqual($sender, $logged_email['header_from'], 'Email "from" address is correct.');
+    $this->assertEqual($from_email, $logged_email['header_all']['Reply-to'], 'Email "from" address is correct.');
+    $this->assertEqual($sender, $logged_email['header_all']['From'], 'Email "from" header is correct.');
     $this->assertEqual($sender, $logged_email['header_all']['Sender'], 'Email "sender" header is correct.');
     $this->assertEqual($sender, $logged_email['header_all']['Return-Path'], 'Email "return-path" header is correct.');
-    $this->assertEqual('Drupal', $logged_email['header_all']['X-Mailer'], 'Email "x-mailer" header is correct.');
+    $this->assertEqual('Backdrop CMS', $logged_email['header_all']['X-Mailer'], 'Email "x-mailer" header is correct.');
     $this->assertEqual(t('Test email subject'), $logged_email['subject'], 'Email subject is correct.');
     $this->assertEqual(t('Test email body.') . "\n", $logged_email['body'], 'Email body is correct.');
   }
@@ -95,7 +83,7 @@ class MaillogUnitTest extends DrupalWebTestCase {
     $from_email = 'from_test@example.com';
     $to_email = 'to_test@example.com';
     $params = array();
-    drupal_mail('maillog_tests', 'maillog_long_subject_test', $to_email, $langcode, $params, $from_email);
+    backdrop_mail('maillog_tests', 'maillog_long_subject_test', $to_email, $langcode, $params, $from_email);
 
     // Compare the maillog db entry with the sent mail.
     $logged_email = $this->getLatestMaillogEntry();
@@ -105,7 +93,7 @@ class MaillogUnitTest extends DrupalWebTestCase {
     $subject = str_repeat(t('Test email subject') . ' ', 20);
 
     // Duplicate the string trimming.
-    $subject_trimmed = drupal_substr($subject, 0, 255);
+    $subject_trimmed = backdrop_substr($subject, 0, 255);
 
     $this->assertEqual($subject_trimmed, $logged_email['subject'], 'Email subject was trimmed correctly.');
     $this->assertNotEqual($subject, $logged_email['subject'], 'Email subject is not untrimmed.');
@@ -122,7 +110,7 @@ class MaillogUnitTest extends DrupalWebTestCase {
     $from_email = 'from_test@example.com';
     $to_email = 'to_test@example.com';
     $params = array();
-    drupal_mail('maillog_tests', 'maillog_subject_xss_test', $to_email, $langcode, $params, $from_email);
+    backdrop_mail('maillog_tests', 'maillog_subject_xss_test', $to_email, $langcode, $params, $from_email);
 
     // Compare the maillog db entry with the sent mail.
     $logged_email = $this->getLatestMaillogEntry();
@@ -132,16 +120,16 @@ class MaillogUnitTest extends DrupalWebTestCase {
     $this->loginAdminUser();
 
     // Load the admin list page.
-    $this->drupalGet('admin/reports/maillog');
+    $this->backdropGet('admin/reports/maillog');
     $this->assertResponse(200);
-  
+
     // Confirm that the page has been defanged.
     $this->assertText('XSS test');
     $this->assertRaw(check_plain($xss_string));
     $this->assertNoRaw($xss_string);
 
     // Load the maillog view page.
-    $this->drupalGet('maillog/details/' . $logged_email['idmaillog']);
+    $this->backdropGet('maillog/details/' . $logged_email['idmaillog']);
     $this->assertResponse(200);
 
     // Confirm that the page has been defanged.
@@ -150,7 +138,7 @@ class MaillogUnitTest extends DrupalWebTestCase {
     $this->assertNoRaw($xss_string);
 
     // Check the title.
-    $this->assertTitle($xss_string . ' | ' . variable_get('site_name', 'Drupal'));
+    $this->assertTitle($xss_string . ' | ' . config_get('system.core', 'site_name'));
   }
 
   /**
@@ -164,7 +152,7 @@ class MaillogUnitTest extends DrupalWebTestCase {
     $from_email = 'from_test@example.com';
     $to_email = 'to_test@example.com';
     $params = array();
-    drupal_mail('maillog_tests', 'maillog_body_xss_test', $to_email, $langcode, $params, $from_email);
+    backdrop_mail('maillog_tests', 'maillog_body_xss_test', $to_email, $langcode, $params, $from_email);
 
     // Compare the maillog db entry with the sent mail.
     $logged_email = $this->getLatestMaillogEntry();
@@ -174,7 +162,7 @@ class MaillogUnitTest extends DrupalWebTestCase {
     $this->loginAdminUser();
 
     // Load the maillog view page.
-    $this->drupalGet('maillog/details/' . $logged_email['idmaillog']);
+    $this->backdropGet('maillog/details/' . $logged_email['idmaillog']);
     $this->assertResponse(200);
 
     // The body field will be passed through check_plain, which will remove all
@@ -209,7 +197,7 @@ class MaillogUnitTest extends DrupalWebTestCase {
    */
   function loginAdminUser() {
     $user = $this->createAdminUser();
-    $this->drupalLogin($user);
+    $this->backdropLogin($user);
   }
 
   /**
@@ -224,11 +212,11 @@ class MaillogUnitTest extends DrupalWebTestCase {
     );
 
     // Reset the static variable used to identify permissions, otherwise it's
-    // possible the permissions check in drupalCreateUser will fail.
+    // possible the permissions check in backdropCreateUser will fail.
     $this->checkPermissions(array(), TRUE);
     cache_clear_all();
 
-    return $this->drupalCreateUser($permissions);
+    return $this->backdropCreateUser($permissions);
   }
 
 }

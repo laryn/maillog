@@ -1,0 +1,143 @@
+{
+    "_config_name": "views.view.maillog",
+    "name": "maillog",
+    "description": "Displays the list of e-mails logged by the 'Mail Log' module.",
+    "module": "maillog",
+    "storage": 4,
+    "tag": "",
+    "disabled": false,
+    "base_table": "maillog",
+    "human_name": "Mail Log Report",
+    "core": "1.0",
+    "display": {
+        "default": {
+            "display_title": "Defaults",
+            "display_plugin": "default",
+            "display_options": {
+                "query": {
+                    "type": "views_query",
+                    "options": []
+                },
+                "title": "Maillog",
+                "use_more_always": false,
+                "access": {
+                    "type": "perm",
+                    "perm": "view maillog"
+                },
+                "cache": {
+                    "type": "none"
+                },
+                "exposed_form": {
+                    "type": "basic"
+                },
+                "pager": {
+                    "type": "none"
+                },
+                "style_plugin": "table",
+                "empty": {
+                    "area_text_custom": {
+                        "id": "area_text_custom",
+                        "table": "views",
+                        "field": "area_text_custom",
+                        "label": "Maillog",
+                        "empty": true,
+                        "content": "Maillog is currently empty. Send a mail!"
+                    }
+                },
+                "fields": {
+                    "idmaillog": {
+                        "id": "idmaillog",
+                        "table": "maillog",
+                        "field": "idmaillog",
+                        "exclude": true
+                    },
+                    "sent_date": {
+                        "id": "sent_date",
+                        "table": "maillog",
+                        "field": "sent_date"
+                    },
+                    "header_message_id": {
+                        "id": "header_message_id",
+                        "table": "maillog",
+                        "field": "header_message_id"
+                    },
+                    "subject": {
+                        "id": "subject",
+                        "table": "maillog",
+                        "field": "subject",
+                        "alter": {
+                            "make_link": true,
+                            "path": "maillog/details/[idmaillog]"
+                        }
+                    },
+                    "header_from": {
+                        "id": "header_from",
+                        "table": "maillog",
+                        "field": "header_from"
+                    },
+                    "header_to": {
+                        "id": "header_to",
+                        "table": "maillog",
+                        "field": "header_to"
+                    },
+                    "nothing": {
+                        "id": "nothing",
+                        "table": "views",
+                        "field": "nothing",
+                        "label": "",
+                        "exclude": true,
+                        "alter": {
+                            "text": "view",
+                            "make_link": true,
+                            "path": "maillog/details/[idmaillog]"
+                        },
+                        "element_label_colon": false
+                    },
+                    "delete_maillog": {
+                        "id": "delete_maillog",
+                        "table": "maillog",
+                        "field": "delete_maillog",
+                        "label": "",
+                        "exclude": true,
+                        "element_label_colon": false
+                    },
+                    "nothing_1": {
+                        "id": "nothing_1",
+                        "table": "views",
+                        "field": "nothing",
+                        "label": "Actions",
+                        "alter": {
+                            "text": "[nothing] | [delete_maillog]"
+                        }
+                    }
+                },
+                "sorts": {
+                    "sent_date": {
+                        "id": "sent_date",
+                        "table": "maillog",
+                        "field": "sent_date",
+                        "order": "DESC"
+                    }
+                }
+            }
+        },
+        "page_1": {
+            "display_title": "Page",
+            "display_plugin": "page",
+            "display_options": {
+                "query": {
+                    "type": "views_query",
+                    "options": []
+                },
+                "path": "admin/reports/maillog",
+                "menu": {
+                    "type": "normal",
+                    "title": "Maillog",
+                    "description": "Show the logged mails",
+                    "weight": "0",
+                    "name": "management"
+                }
+            }
+        }
+    }
+}
