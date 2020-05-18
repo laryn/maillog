@@ -58,6 +58,7 @@ function maillog_menu() {
     'page arguments' => array(2),
     'access arguments' => array('delete maillog'),
     'type' => MENU_CALLBACK,
+    'file' => 'maillog.pages.inc',
   );
   $items['maillog/details/%maillog_maillog'] = array(
     'title callback' => 'maillog_maillog_title',
@@ -67,6 +68,7 @@ function maillog_menu() {
     'page arguments' => array(2),
     'access arguments' => array('view maillog'),
     'type' => MENU_CALLBACK,
+    'file' => 'maillog.pages.inc',
   );
 
   return $items;
@@ -106,36 +108,6 @@ function maillog_maillog_load($idmaillog) {
     $maillog['header_all'] = unserialize($maillog['header_all']);
   }
   return $maillog;
-}
-
-/**
- * Delete a maillog record.
- *
- * @param array $maillog
- *   A maillog record that is to be deleted with an 'idmaillog' value.
- */
-function maillog_maillog_delete($maillog) {
-  $idmaillog = $maillog['idmaillog'];
-  $result = db_query("DELETE FROM {maillog} WHERE idmaillog = :id", array(':id' => $idmaillog));
-  if ($result == FALSE) {
-    drupal_set_message(t('A Problem occured when deleting Mail with ID !idmaillog !', array('!idmaillog' => $idmaillog)));
-  }
-  else {
-    drupal_set_message(t('Mail with ID !idmaillog has been deleted!', array('!idmaillog' => $idmaillog)));
-  }
-  drupal_goto('admin/reports/maillog');
-}
-
-/**
- * Display a maillog record.
- *
- * @param array $maillog
- *   A maillog record that is to be deleted with an 'idmaillog' value.
- *
- * @return string
- */
-function maillog_maillog_page($maillog) {
-  return theme('maillog', array('maillog' => $maillog));
 }
 
 /**
