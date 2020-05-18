@@ -17,7 +17,7 @@ function maillog_enable() {
   $mail_system['maillog'] = 'MaillogMailSystem';
 
   // If maillog is enabled, don't take over the default
-  if ($mail_system['default-system'] != $default_class) {
+  if ($mail_system['default-system'] == $default_class) {
     $mail_system['default-system'] = $mail_system['maillog'];
   }
   else {
