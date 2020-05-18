@@ -52,22 +52,23 @@ function maillog_menu() {
     'file' => 'maillog.admin.inc',
   );
 
-  $items['maillog/delete/%maillog_maillog'] = array(
-    'title' => t("Delete Maillog from 'maillog' Table"),
-    'description' => t("Delete the Maillog with the ID given by the parameter from 'maillog' Table"),
-    'page callback' => 'maillog_maillog_delete',
-    'page arguments' => array(2),
-    'access arguments' => array('delete maillog'),
-    'type' => MENU_CALLBACK,
-    'file' => 'maillog.pages.inc',
-  );
   $items['maillog/details/%maillog_maillog'] = array(
     'title callback' => 'maillog_maillog_title',
     'title arguments' => array(2),
-    'description' => t("Delete the Maillog with the ID given by the parameter from 'maillog' Table"),
+    'description' => t('View a specific Maillog record.'),
     'page callback' => 'maillog_maillog_page',
     'page arguments' => array(2),
     'access arguments' => array('view maillog'),
+    'type' => MENU_CALLBACK,
+    'file' => 'maillog.pages.inc',
+  );
+
+  $items['maillog/delete/%maillog_maillog'] = array(
+    'title' => t("Delete Maillog record"),
+    'description' => t('Delete a specific Maillog record.'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('maillog_maillog_delete_form', 2),
+    'access arguments' => array('delete maillog'),
     'type' => MENU_CALLBACK,
     'file' => 'maillog.pages.inc',
   );
@@ -91,7 +92,7 @@ function maillog_maillog_title($maillog) {
  * Load a maillog record.
  *
  * @param int $idmaillog
- *   The primary ID for a maillog record.
+ *   The primary ID for a Maillog record.
  *
  * @return null|array
  *   An array containing the {maillog} record if found, NULL if not.
@@ -105,10 +106,23 @@ function maillog_maillog_load($idmaillog) {
   }
   else {
     $maillog = $result->fetchAssoc();
-    // unserialize values
+    // Unserialize values.
     $maillog['header_all'] = unserialize($maillog['header_all']);
   }
   return $maillog;
+}
+
+/**
+ * Delete a specific maillog record.
+ *
+ * @param int $idmaillog
+ *   The primary ID for a maillog record.
+ *
+ * @return DatabaseStatementInterface
+ *   The response from db_query().
+ */
+function maillog_maillog_delete($idmaillog) {
+  return db_query("DELETE FROM {maillog} WHERE idmaillog = :id", array(':id' => $idmaillog));
 }
 
 /**
