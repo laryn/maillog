@@ -15,17 +15,34 @@ use Behat\Gherkin\Node\TableNode;
 use Drupal\DrupalExtension\Context\DrupalSubContextInterface;
 use Drupal\DrupalDriverManager;
 
+/**
+ * Behat subcontext for testing whether specific emails have been sent.
+ */
 class Maillog implements DrupalSubContextInterface {
 
+  /**
+   * The Drupal instance being tested.
+   *
+   * @var object
+   */
   private $drupal;
-  protected $last_id;
 
+  /**
+   * The last message ID.
+   *
+   * @var int
+   */
+  protected $lastId;
+
+  /**
+   * {@inheritdoc}
+   */
   public function __construct(DrupalDriverManager $drupal) {
     $this->drupal = $drupal;
   }
 
   /**
-   * Implements DrupalSubContextInterface::getAlias().
+   * {@inheritdoc}
    */
   public static function getAlias() {
     return 'maillog';
@@ -36,7 +53,7 @@ class Maillog implements DrupalSubContextInterface {
    */
   public function setLastId() {
     if (module_exists('maillog')) {
-      $this->last_id = (int) db_query('SELECT MAX(idmaillog) FROM {maillog}')->fetchField();
+      $this->lastId = (int) db_query('SELECT MAX(idmaillog) FROM {maillog}')->fetchField();
     }
   }
 
@@ -48,7 +65,7 @@ class Maillog implements DrupalSubContextInterface {
 
     $actual_emails = db_select('maillog', 'm')
       ->fields('m')
-      ->condition('idmaillog', $this->last_id, '>')
+      ->condition('idmaillog', $this->lastId, '>')
       ->orderBy('idmaillog', 'DESC')
       ->execute()
       ->fetchAllAssoc('idmaillog', PDO::FETCH_ASSOC);
@@ -75,23 +92,23 @@ class Maillog implements DrupalSubContextInterface {
   }
 
   /**
-   * Returns TRUE if the actual email matches the expected email.
+   * Determine if the actual email matches the expected email.
    *
    * @param array $actual
    *   An associative array of all the columns in the actual maillog database
    *   table row.
-   *
    * @param array $expected
    *   The expected email values. Allowed, case insensitive keys are:
    *   - Subject:   strcasecmp comparison
    *   - To:        strcasecmp comparison
    *   - From:      strcasecmp comparison
    *   - Reply to:  strcasecmp comparison
-   *   - Body:      stristr comparison
+   *   - Body:      stristr comparison.
    *
    * @return bool
+   *   Whether the expected message matches the actual message.
    */
-  protected function emailsMatch($actual, $expected) {
+  protected function emailsMatch(array $actual, array $expected) {
     foreach ($expected as $part => $passed_value) {
       $expected_value = trim($passed_value);
       $part = strtolower($part);

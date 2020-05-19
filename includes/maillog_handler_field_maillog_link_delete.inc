@@ -2,30 +2,40 @@
 
 /**
  * @file
- * Handler for providing an 'Delete link' in views
+ * Handler for providing a 'Delete link' in views.
  */
 
-class maillog_handler_field_maillog_link_delete extends views_handler_field {
-  function construct() {
+/**
+ * Handler for providing a 'Delete link' in views.
+ */
+class MaillogHandlerFieldMaillogLinkDelete extends views_handler_field {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function construct() {
     parent::construct();
     $this->additional_fields['idmaillog'] = 'idmaillog';
   }
 
   /**
-   * Called to add the field to a query.
+   * {@inheritdoc}
    */
-  function query() {
+  public function query() {
     $this->ensure_my_table();
     $this->add_additional_fields();
   }
 
-  function render($values) {
-    // ensure user has access to edit this node.
+  /**
+   * {@inheritdoc}
+   */
+  public function render($values) {
+    // Ensure user has access to edit this node.
     if (!user_access('delete maillog')) {
       return;
     }
     $text = !empty($this->options['text']) ? $this->options['text'] : t('delete');
     return l($text, "maillog/delete/$values->idmaillog", array('query' => drupal_get_destination()));
   }
-}
 
+}

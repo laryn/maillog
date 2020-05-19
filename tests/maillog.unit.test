@@ -1,9 +1,13 @@
 <?php
+
 /**
  * @file
  * Unit-ish tests for the Maillog module.
  */
 
+/**
+ * All unit tests for the module.
+ */
 class MaillogUnitTest extends DrupalWebTestCase {
 
   /**
@@ -20,7 +24,7 @@ class MaillogUnitTest extends DrupalWebTestCase {
   /**
    * {@inheritdoc}
    */
-  function setUp(array $modules = array()) {
+  public function setUp(array $modules = array()) {
     // Requirements.
     $modules[] = 'maillog';
 
@@ -42,7 +46,7 @@ class MaillogUnitTest extends DrupalWebTestCase {
   /**
    * Confirm that SimpleTest has taken over the 'mail_system' variable.
    */
-  function testSetup() {
+  public function testSetup() {
     $enabled = variable_get('mail_system', array());
     $should_be = array(
       'default-system' => 'MaillogMailSystem',
@@ -114,7 +118,7 @@ class MaillogUnitTest extends DrupalWebTestCase {
   /**
    * Confirm that it is not possible to create XSS attacks via an email subject.
    */
-  public function testSubjectXSS() {
+  public function testSubjectXss() {
     $langcode = language_default('language');
     $xss_string = '<script type="text/javascript">alert("XSS test")</script>';
 
@@ -134,7 +138,7 @@ class MaillogUnitTest extends DrupalWebTestCase {
     // Load the admin list page.
     $this->drupalGet('admin/reports/maillog');
     $this->assertResponse(200);
-  
+
     // Confirm that the page has been defanged.
     $this->assertText('XSS test');
     $this->assertRaw(check_plain($xss_string));
@@ -156,7 +160,7 @@ class MaillogUnitTest extends DrupalWebTestCase {
   /**
    * Confirm that it is not possible to create XSS attacks via an email body.
    */
-  public function testBodyXSS() {
+  public function testBodyXss() {
     $langcode = language_default('language');
     $xss_string = '<script type="text/javascript">alert("XSS test")</script>';
 
@@ -207,7 +211,7 @@ class MaillogUnitTest extends DrupalWebTestCase {
   /**
    * Log into the site as an admin user.
    */
-  function loginAdminUser() {
+  public function loginAdminUser() {
     $user = $this->createAdminUser();
     $this->drupalLogin($user);
   }
@@ -215,7 +219,7 @@ class MaillogUnitTest extends DrupalWebTestCase {
   /**
    * Create an admin account.
    */
-  function createAdminUser() {
+  public function createAdminUser() {
     $permissions = array(
       'administer maillog',
       'view maillog',

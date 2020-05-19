@@ -9,11 +9,12 @@
  * Display a maillog record.
  *
  * @param array $maillog
- *   A maillog record that is to be deleted with an 'idmaillog' value.
+ *   A maillog record that is to be deleted.
  *
  * @return string
+ *   Themed output of the maillog page.
  */
-function maillog_maillog_page($maillog) {
+function maillog_maillog_page(array $maillog) {
   return theme('maillog', array('maillog' => $maillog));
 }
 

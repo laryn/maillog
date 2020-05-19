@@ -2,11 +2,11 @@
 
 /**
  * @file
- * Creates the default view for the 'Log Mail' module
+ * Creates the default view for the 'Log Mail' module.
  */
 
 /**
- * Implementation of hook_views_default_views().
+ * Implements hook_views_default_views().
  */
 function maillog_views_default_views() {
   $view = new view();

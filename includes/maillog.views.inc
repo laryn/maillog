@@ -2,11 +2,11 @@
 
 /**
  * @file
- * Make the fields from node type 'Logged Mail' available in views
+ * Make the fields from node type 'Logged Mail' available in views.
  */
 
 /**
- * Implementation of hook_views_data().
+ * Implements hook_views_data().
  */
 function maillog_views_data() {
   $data['maillog']['table']['group'] = t('Maillog');
@@ -191,8 +191,7 @@ function maillog_views_data() {
 }
 
 /**
- * Implementation of hook_views_handlers() to register all of the basic handlers
- * views uses.
+ * Implements hook_views_handlers().
  */
 function maillog_views_handlers() {
   return array(
@@ -200,11 +199,10 @@ function maillog_views_handlers() {
       'path' => drupal_get_path('module', 'maillog') . '/includes',
     ),
     'handlers' => array(
-      // field handlers
+      // Field handlers.
       'maillog_handler_field_maillog_link_delete' => array(
         'parent' => 'views_handler_field',
       ),
     ),
   );
 }
-

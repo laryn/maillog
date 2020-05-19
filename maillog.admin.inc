@@ -31,7 +31,7 @@ function maillog_admin_settings() {
 
   if (module_exists('mailsystem')) {
     $mailsystem_classes = mailsystem_get_classes();
-    // maillog will be unset, because ist would cause an recursion
+    // Maillog will be unset, because ist would cause an recursion.
     unset($mailsystem_classes['MaillogMailSystem']);
     $form['maillog_engine'] = array(
       '#type' => 'select',

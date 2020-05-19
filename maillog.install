@@ -2,11 +2,11 @@
 
 /**
  * @file
- * Provides the installation routines for the maillog module
+ * Provides the installation routines for the maillog module.
  */
 
 /**
- * Implementation of hook_enable().
+ * Implements hook_enable().
  */
 function maillog_enable() {
   // The system default class.
@@ -16,7 +16,7 @@ function maillog_enable() {
   $mail_system = variable_get('mail_system', array('default-system' => $default_class));
   $mail_system['maillog'] = 'MaillogMailSystem';
 
-  // If maillog is enabled, don't take over the default
+  // If maillog is enabled, don't take over the default.
   if ($mail_system['default-system'] == $default_class) {
     $mail_system['default-system'] = $mail_system['maillog'];
   }
@@ -38,7 +38,7 @@ function maillog_enable() {
 }
 
 /**
- * Implementation of hook_disable().
+ * Implements hook_disable().
  */
 function maillog_disable() {
   // Get the current mail system config.
@@ -73,47 +73,47 @@ function maillog_disable() {
 }
 
 /**
- * Implementation of hook_schema().
+ * Implements hook_schema().
  */
 function maillog_schema() {
   $schema['maillog'] = array(
-    'description' => t("Stores outgoing e-mail details for nodes of type 'maillog'."),
+    'description' => "Stores outgoing e-mail details for nodes of type 'maillog'.",
     'fields' => array(
       'idmaillog' => array(
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
-        'description' => t("The mail_log {node}.nid"),
+        'description' => "The mail_log {node}.nid",
       ),
       'header_message_id' => array(
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => '',
-        'description' => t("The 'message-id' field of the e-mail."),
+        'description' => "The 'message-id' field of the e-mail.",
       ),
       'header_from' => array(
         'type' => 'text',
         'not null' => TRUE,
-        'description' => t("The 'From' field of the e-mail."),
+        'description' => "The 'From' field of the e-mail.",
       ),
       'header_to' => array(
         'type' => 'text',
         'not null' => TRUE,
-        'description' => t("The 'To' field of the e-mail."),
+        'description' => "The 'To' field of the e-mail.",
       ),
       'header_reply_to' => array(
         'type' => 'text',
         'not null' => TRUE,
-        'description' => t("The 'Reply-To' field of the e-mail."),
+        'description' => "The 'Reply-To' field of the e-mail.",
       ),
       'header_all' => array(
         'type' => 'text',
         'not null' => TRUE,
-        'description' => t("The 'Header' field of the e-mail."),
+        'description' => "The 'Header' field of the e-mail.",
       ),
       'subject' => array(
-        'description' => t("The 'Subject' fieldof the e-mail."),
+        'description' => "The 'Subject' fieldof the e-mail.",
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
@@ -123,7 +123,7 @@ function maillog_schema() {
         'description' => 'The body of this version.',
         'type' => 'text',
         'not null' => TRUE,
-        'size' => 'big'
+        'size' => 'big',
       ),
       'sent_date' => array(
         'description' => 'The Unix timestamp when the mail was sent.',

@@ -2,22 +2,22 @@
 
 /**
  * @file
- * Provides a 'maillog' node type
- *
- * @todo: better implementation of detail link
- *
- *
- * Extensibility of maillog engines is based on the mimemail engine hooks.
- * See mimemail_get_engines in mimemail.module with
- * Please install mimemail to make the outgoing engine pluggable.
- *
- * mail flow:
- * drupal_mail -> maillog:drupal_mail_wrapper -> maillog_mail_send
- * mimemail -> maillog_mailengine -> maillog_mail_send [-> ANY_engine]
+ * Primary hook implementations for the Maillog module.
  */
 
 /**
- * Implementation of hook_permision().
+ * Extensibility of maillog engines is based on the mimemail engine hooks.
+ *
+ * See mimemail_get_engines in mimemail.module with
+ * Please install mimemail to make the outgoing engine pluggable.
+ *
+ * Mail flow:
+ * * drupal_mail -> maillog:drupal_mail_wrapper -> maillog_mail_send
+ * * mimemail -> maillog_mailengine -> maillog_mail_send [-> ANY_engine]
+ */
+
+/**
+ * Implements hook_permision().
  */
 function maillog_permission() {
   return array(
@@ -37,14 +37,14 @@ function maillog_permission() {
 }
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  */
 function maillog_menu() {
   $items = array();
 
   $items['admin/config/development/maillog'] = array(
-    'title' => t('Maillog Settings'),
-    'description' => t('Configure the settings of Maillog module.'),
+    'title' => 'Maillog Settings',
+    'description' => 'Configure the settings of Maillog module.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('maillog_admin_settings'),
     'access arguments' => array('administer maillog'),
@@ -55,7 +55,7 @@ function maillog_menu() {
   $items['maillog/details/%maillog_maillog'] = array(
     'title callback' => 'maillog_maillog_title',
     'title arguments' => array(2),
-    'description' => t('View a specific Maillog record.'),
+    'description' => 'View a specific Maillog record.',
     'page callback' => 'maillog_maillog_page',
     'page arguments' => array(2),
     'access arguments' => array('view maillog'),
@@ -64,8 +64,8 @@ function maillog_menu() {
   );
 
   $items['maillog/delete/%maillog_maillog'] = array(
-    'title' => t("Delete Maillog record"),
-    'description' => t('Delete a specific Maillog record.'),
+    'title' => 'Delete Maillog record',
+    'description' => 'Delete a specific Maillog record.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('maillog_maillog_delete_form', 2),
     'access arguments' => array('delete maillog'),
@@ -83,8 +83,9 @@ function maillog_menu() {
  *   A maillog record that is to be deleted with an 'idmaillog' value.
  *
  * @return string
+ *   The title of a specific message.
  */
-function maillog_maillog_title($maillog) {
+function maillog_maillog_title(array $maillog) {
   return $maillog['subject'];
 }
 
@@ -126,7 +127,7 @@ function maillog_maillog_delete($idmaillog) {
 }
 
 /**
- * Implementation of hook_views_api().
+ * Implements hook_views_api().
  */
 function maillog_views_api() {
   return array(
@@ -136,7 +137,7 @@ function maillog_views_api() {
 }
 
 /**
- * Implementation of hook_theme().
+ * Implements hook_theme().
  */
 function maillog_theme() {
   return array(
@@ -165,9 +166,7 @@ function maillog_theme() {
  * Render a maillog record.
  */
 function theme_maillog($variables) {
-  $output = '';
-
-  $output .= theme('maillog_header_from', array('header_from' => $variables['maillog']['header_from']));
+  $output = theme('maillog_header_from', array('header_from' => $variables['maillog']['header_from']));
   $output .= theme('maillog_header_to', array('header_to' => $variables['maillog']['header_to']));
   $output .= theme('maillog_header_reply_to', array('header_reply_to' => $variables['maillog']['header_reply_to']));
   $output .= theme('maillog_header_all', array('header_all' => $variables['maillog']['header_all']));
@@ -177,83 +176,73 @@ function theme_maillog($variables) {
 }
 
 /**
- * Render the 'From' field in the node type 'Logged Mail'
+ * Render the 'From' field in the node type 'Logged Mail'.
  */
 function theme_maillog_header_from($variables) {
-  $output = '';
-
-  $output .= '<div class="field mail-log-header-from">';
-  $output .= '<div class="field-label">' . t('From') . ':</div>';
-  $output .= '<div class="field-item">' . check_plain($variables['header_from']) . '</div>';
-  $output .= '</div>';
+  $output = '<div class="field mail-log-header-from">';
+  $output .= '<div class="field-label">' . t('From') . ":</div>\n";
+  $output .= '<div class="field-item">' . check_plain($variables['header_from']) . "</div>\n";
+  $output .= "</div>\n";
 
   return $output;
 }
 
 /**
- * Render the 'To' field in the node type 'Logged Mail'
+ * Render the 'To' field in the node type 'Logged Mail'.
  */
 function theme_maillog_header_to($variables) {
-  $output = '';
-
-  $output .= '<div class="field mail-log-header-to">';
-  $output .= '<div class="field-label">' . t('To') . ':</div>';
-  $output .= '<div class="field-item">' . check_plain($variables['header_to']) . '</div>';
-  $output .= '</div>';
+  $output = '<div class="field mail-log-header-to">' . "\n";
+  $output .= '<div class="field-label">' . t('To') . ":</div>\n";
+  $output .= '<div class="field-item">' . check_plain($variables['header_to']) . "</div>\n";
+  $output .= "</div>\n";
 
   return $output;
 }
 
 /**
- * Render the 'Reply-To' field in the node type 'Logged Mail'
+ * Render the 'Reply-To' field in the node type 'Logged Mail'.
  */
 function theme_maillog_header_reply_to($variables) {
-  $output = '';
-
-  $output .= '<div class="field mail-log-header-reply-to">';
-  $output .= '<div class="field-label">' . t('Reply To') . ':</div>';
-  $output .= '<div class="field-item">' . check_plain($variables['header_reply_to']) . '</div>';
-  $output .= '</div>';
+  $output = '<div class="field mail-log-header-reply-to">' . "\n";
+  $output .= '  <div class="field-label">' . t('Reply To') . ":</div>\n";
+  $output .= '  <div class="field-item">' . check_plain($variables['header_reply_to']) . "</div>\n";
+  $output .= "</div>\n";
 
   return $output;
 }
 
 /**
- * Render the 'Header' field in the node type 'Logged Mail'
+ * Render the 'Header' field in the node type 'Logged Mail'.
  */
 function theme_maillog_header_all($variables) {
-  $output = '';
-
-  $output .= '<div class="field mail-log-header-all">';
-  $output .= '<div class="field-label">' . t('Header') . ':</div>';
-  $output .= '<div class="field-item">';
+  $output = '<div class="field mail-log-header-all">' . "\n";
+  $output .= '  <div class="field-label">' . t('Header') . ":</div>\n";
+  $output .= '  <div class="field-item">' . "\n";
 
   foreach ($variables['header_all'] as $header_all_name => $header_all_value) {
-    $output .= '<div class="mail-log-header-all-subitem">';
+    $output .= '    <div class="mail-log-header-all-subitem">';
     $output .= check_plain($header_all_name) . ': ' . check_plain($header_all_value);
-    $output .= '</div>';
+    $output .= "</div>\n";
   }
 
-  $output .= '</div>';
-  $output .= '</div>';
+  $output .= "  </div>\n";
+  $output .= "</div>\n";
 
   return $output;
 }
 
 /**
- * Render the 'Body' field in the node type 'Logged Mail'
+ * Render the 'Body' field in the node type 'Logged Mail'.
  */
 function theme_maillog_body($variables) {
-  $output = '';
-
-  $output .= '<div class="field mail-log-body">';
-  $output .= '<div class="field-label">' . t('Body') . ':</div>';
-  $output .= '<div class="field-item">';
-  $output .= '<pre>';
+  $output = '<div class="field mail-log-body">' . "\n";
+  $output .= '  <div class="field-label">' . t('Body') . ":</div>\n";
+  $output .= '  <div class="field-item">' . "\n";
+  $output .= "    <pre>\n";
   $output .= check_plain($variables['body']);
-  $output .= '</pre>';
-  $output .=  '</div>';
-  $output .= '</div>';
+  $output .= "    </pre>\n";
+  $output .= "  </div>\n";
+  $output .= "</div>\n";
 
   return $output;
 }
