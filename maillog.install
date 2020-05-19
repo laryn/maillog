@@ -153,19 +153,27 @@ function maillog_uninstall() {
  */
 
 /**
- * Rename the 'idmaillog' column to just 'id'.
- *
- * Order of operations taken from the API documentation for db_change_field().
- *
- * @see https://api.drupal.org/api/drupal/includes%21database%21database.inc/function/db_change_field/7.x
+ * Rename the 'idmaillog' field to just 'id'.
  */
 function maillog_update_7100() {
   if (!db_field_exists('maillog', 'id')) {
-    // Delete the primary key.
-    db_drop_primary_key('maillog');
+    // Add the new 'id' field.
+    $spec = array(
+      'type' => 'int',
+      'not null' => TRUE,
+      'unsigned' => TRUE,
+      'default' => 0,
+      'description' => "The primary key of this table.",
+    );
+    db_add_field('maillog', 'id', $spec);
 
-    // Rename the existing 'idmaillog' column to just 'id', and make it the
-    // primary key.
+    // Fill in all of the 'id' fields.
+    db_query("UPDATE {maillog} SET id=idmaillog");
+
+    // Drop the 'idmaillog' field
+    db_drop_field('maillog', 'idmaillog');
+
+    // Change the 'id' field to a serial.
     $spec = array(
       'type' => 'serial',
       'unsigned' => TRUE,
@@ -175,6 +183,6 @@ function maillog_update_7100() {
     $keys = array(
       'primary key' => array('id'),
     );
-    db_change_field('maillog', 'idmaillog', 'id', $spec, $keys);
+    db_change_field('maillog', 'id', 'id', $spec, $keys);
   }
 }
