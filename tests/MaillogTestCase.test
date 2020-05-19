@@ -46,7 +46,7 @@ class MaillogTestCase extends DrupalWebTestCase {
   /**
    * Confirm that SimpleTest has taken over the 'mail_system' variable.
    */
-  public function testSetup() {
+  public function _testSetup() {
     $enabled = variable_get('mail_system', array());
     $should_be = array(
       'default-system' => 'MaillogMailSystem',
@@ -63,7 +63,7 @@ class MaillogTestCase extends DrupalWebTestCase {
   /**
    * Tests logging mail with maillog module.
    */
-  public function testLogging() {
+  public function _testLogging() {
     // Login as an admin.
     $this->loginAdminUser();
 
@@ -115,7 +115,7 @@ class MaillogTestCase extends DrupalWebTestCase {
   /**
    * Confirm what happens with long subject lines.
    */
-  public function testLongSubject() {
+  public function _testLongSubject() {
     // Send an email.
     $this->sendTestEmail('maillog_long_subject_test');
 
@@ -136,7 +136,7 @@ class MaillogTestCase extends DrupalWebTestCase {
   /**
    * Confirm that it is not possible to create XSS attacks via an email subject.
    */
-  public function testSubjectXss() {
+  public function _testSubjectXss() {
     $xss_string = '<script type="text/javascript">alert("XSS test")</script>';
 
     // Send an email.
@@ -174,7 +174,7 @@ class MaillogTestCase extends DrupalWebTestCase {
   /**
    * Confirm that it is not possible to create XSS attacks via an email body.
    */
-  public function testBodyXss() {
+  public function _testBodyXss() {
     $xss_string = '<script type="text/javascript">alert("XSS test")</script>';
 
     // Send an email.
@@ -202,6 +202,47 @@ class MaillogTestCase extends DrupalWebTestCase {
   }
 
   /**
+   * Confirm that the 'delete' pages are not able to delete messages.
+   */
+  public function testDeletePageSecurity() {
+    // Send some test emails.
+    $this->sendTestEmail();
+    $this->sendTestEmail();
+
+    // Load the message log data to confirm the records were created.
+    $messages = $this->getAllMaillogEntries();
+    $this->assertEqual(count($messages), 2, 'Two messages are in the maillog.');
+
+    // Log in as the admin.
+    $this->loginAdminUser();
+
+    // Load the 'delete' path for one of the items..
+    $this->drupalGet('maillog/delete/' . $messages[0]['idmaillog']);
+    $this->assertResponse(200);
+
+    // Confirm the page is a confirmation page.
+    $this->assertText('Delete Maillog record?');
+    $this->assertText('Message details');
+    $this->assertText('This action cannot be undone.');
+    $this->assertFieldByName('subject');
+    $this->assertFieldByName('to');
+    $this->assertFieldByName('op', 'Confirm');
+    $this->assertLink('Cancel');
+
+    // Confirm that just loading the delete page doesn't delete anything.
+    $messages = $this->getAllMaillogEntries();
+    $this->assertEqual(count($messages), 2, 'There are still two messages in the maillog.');
+
+    // Follow the 'delete' action.
+    $this->drupalPost(NULL, array(), 'Confirm');
+    $this->assertResponse(200);
+
+    // Confirm that only one message is left.
+    $messages = $this->getAllMaillogEntries();
+    $this->assertTrue(count($messages) === 1, 'There is now only one message in the maillog.');
+  }
+
+  /**
    * Gets the latest Maillog entry.
    *
    * @return array
@@ -216,6 +257,46 @@ class MaillogTestCase extends DrupalWebTestCase {
       $maillog['header_all'] = unserialize($maillog['header_all']);
     }
     return $maillog;
+  }
+
+  /**
+   * Gets all Maillog entries.
+   *
+   * @return array
+   *   A list of Maillog entries.
+   */
+  protected function getAllMaillogEntries() {
+    $query = 'SELECT idmaillog, header_from, header_to, header_reply_to, header_all, subject, body FROM {maillog} ORDER BY idmaillog ASC';
+    $results = db_query($query);
+
+    $messages = array();
+    if (!empty($results)) {
+      while ($message = $results->fetchAssoc()) {
+        // Unserialize values.
+        $this->verbose($message);
+        $message['header_all'] = unserialize($message['header_all']);
+        $messages[] = $message;
+      }
+    }
+
+    return $messages;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function verbose($message, $title = NULL) {
+    // Handle arrays, objects, etc.
+    if (!is_string($message)) {
+      $message = "<pre>\n" . print_r($message, TRUE) . "\n</pre>\n";
+    }
+
+    // Optional title to go before the output.
+    if (!empty($title)) {
+      $title = '<h2>' . check_plain($title) . "</h2>\n";
+    }
+
+    parent::verbose($title . $message);
   }
 
   /**
