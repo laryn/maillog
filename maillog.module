@@ -55,22 +55,22 @@ function maillog_menu() {
     'file' => 'maillog.admin.inc',
   );
 
-  $items['maillog/details/%maillog_maillog'] = array(
+  $items['admin/reports/maillog/view/%maillog_maillog'] = array(
     'title callback' => 'maillog_maillog_title',
-    'title arguments' => array(2),
+    'title arguments' => array(4),
     'description' => 'View a specific Maillog record.',
     'page callback' => 'maillog_maillog_page',
-    'page arguments' => array(2),
+    'page arguments' => array(4),
     'access arguments' => array('view maillog'),
     'type' => MENU_CALLBACK,
     'file' => 'maillog.pages.inc',
   );
 
-  $items['maillog/delete/%maillog_maillog'] = array(
+  $items['admin/reports/maillog/delete/%maillog_maillog'] = array(
     'title' => 'Delete Maillog record',
     'description' => 'Delete a specific Maillog record.',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('maillog_maillog_delete_form', 2),
+    'page arguments' => array('maillog_maillog_delete_form', 4),
     'access arguments' => array('delete maillog'),
     'type' => MENU_CALLBACK,
     'file' => 'maillog.pages.inc',

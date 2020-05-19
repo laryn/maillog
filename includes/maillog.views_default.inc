@@ -55,7 +55,7 @@ function maillog_views_default_views() {
   $handler->display->display_options['fields']['subject']['table'] = 'maillog';
   $handler->display->display_options['fields']['subject']['field'] = 'subject';
   $handler->display->display_options['fields']['subject']['alter']['make_link'] = TRUE;
-  $handler->display->display_options['fields']['subject']['alter']['path'] = 'maillog/details/[id]';
+  $handler->display->display_options['fields']['subject']['alter']['path'] = 'admin/reports/maillog/view/[id]';
   /* Field: Maillog: From */
   $handler->display->display_options['fields']['header_from']['id'] = 'header_from';
   $handler->display->display_options['fields']['header_from']['table'] = 'maillog';
@@ -72,7 +72,7 @@ function maillog_views_default_views() {
   $handler->display->display_options['fields']['nothing']['exclude'] = TRUE;
   $handler->display->display_options['fields']['nothing']['alter']['text'] = 'view';
   $handler->display->display_options['fields']['nothing']['alter']['make_link'] = TRUE;
-  $handler->display->display_options['fields']['nothing']['alter']['path'] = 'maillog/details/[id]';
+  $handler->display->display_options['fields']['nothing']['alter']['path'] = 'admin/reports/maillog/view/[id]';
   $handler->display->display_options['fields']['nothing']['element_label_colon'] = FALSE;
   /* Field: Maillog: Delete link */
   $handler->display->display_options['fields']['delete_maillog']['id'] = 'delete_maillog';

@@ -38,7 +38,7 @@ class MaillogHandlerFieldMaillogLinkDelete extends views_handler_field {
       return;
     }
     $text = !empty($this->options['text']) ? $this->options['text'] : t('delete');
-    return l($text, "maillog/delete/{$values->id}", array('query' => drupal_get_destination()));
+    return l($text, "admin/reports/maillog/delete/{$values->id}", array('query' => drupal_get_destination()));
   }
 
 }

@@ -33,6 +33,8 @@ By DamienMcKenna: Added tests to confirm the list and view pages don't allow XSS
 #1401818 by DamienMcKenna: Test coverage for message deletion.
 #3137940 by DamienMcKenna: Rename "idmaillog" field and variable usage to "id".
 #3137940 by DamienMcKenna: Corrected update script.
+#2831876 by DamienMcKenna, cebasqueira: Change callback paths to use the
+  admin/reports/maillog base.
 
 
 Maillog 7.x-1.0-alpha1, 2014-07-14

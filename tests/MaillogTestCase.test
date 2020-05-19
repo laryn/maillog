@@ -159,7 +159,7 @@ class MaillogTestCase extends DrupalWebTestCase {
     $this->assertNoRaw($xss_string);
 
     // Load the maillog view page.
-    $this->drupalGet('maillog/details/' . $logged_email['id']);
+    $this->drupalGet('admin/reports/maillog/view/' . $logged_email['id']);
     $this->assertResponse(200);
 
     // Confirm that the page has been defanged.
@@ -188,7 +188,7 @@ class MaillogTestCase extends DrupalWebTestCase {
     $this->loginAdminUser();
 
     // Load the maillog view page.
-    $this->drupalGet('maillog/details/' . $logged_email['id']);
+    $this->drupalGet('admin/reports/maillog/view/' . $logged_email['id']);
     $this->assertResponse(200);
 
     // The body field will be passed through check_plain, which will remove all
@@ -217,7 +217,7 @@ class MaillogTestCase extends DrupalWebTestCase {
     $this->loginAdminUser();
 
     // Load the 'delete' path for one of the items..
-    $this->drupalGet('maillog/delete/' . $messages[0]['id']);
+    $this->drupalGet('admin/reports/maillog/delete/' . $messages[0]['id']);
     $this->assertResponse(200);
 
     // Confirm the page is a confirmation page.

@@ -186,3 +186,18 @@ function maillog_update_7100() {
     db_change_field('maillog', 'id', 'id', $spec, $keys);
   }
 }
+
+/**
+ * Clear the menu cache so the new paths will be picked up.
+ */
+function maillog_update_7101() {
+  variable_set('menu_rebuild_needed', TRUE);
+}
+
+/**
+ * Clear the Views cache so the updated admin page will get the new paths.
+ */
+function maillog_update_7102() {
+  cache_clear_all('*', 'cache_views', TRUE);
+  cache_clear_all('*', 'cache_views_data', TRUE);
+}
