@@ -7,6 +7,9 @@
 
 /**
  * Handler for providing a 'Delete link' in views.
+ *
+ * @see maillog_views_data()
+ * @see maillog_views_handlers()
  */
 class MaillogHandlerFieldMaillogLinkDelete extends views_handler_field {
 

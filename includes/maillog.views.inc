@@ -183,10 +183,11 @@ function maillog_views_data() {
   $data['maillog']['delete_maillog'] = array(
     'field' => array(
       'title' => t('Delete link'),
-      'help' => t('Provide a simple link to delete an eMail entry from the maillog table.'),
-      'handler' => 'maillog_handler_field_maillog_link_delete',
+      'help' => t('Provide a simple link to delete an email entry from the maillog table.'),
+      'handler' => 'MaillogHandlerFieldMaillogLinkDelete',
     ),
   );
+
   return $data;
 }
 
@@ -200,7 +201,7 @@ function maillog_views_handlers() {
     ),
     'handlers' => array(
       // Field handlers.
-      'maillog_handler_field_maillog_link_delete' => array(
+      'MaillogHandlerFieldMaillogLinkDelete' => array(
         'parent' => 'views_handler_field',
       ),
     ),

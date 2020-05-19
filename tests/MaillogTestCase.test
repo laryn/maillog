@@ -17,7 +17,7 @@ class MaillogTestCase extends DrupalWebTestCase {
     return array(
       'name' => 'Maillog tests',
       'description' => 'Test the main Maillog functionality.',
-      'group' => 'Maillog',
+      'group' => 'maillog',
     );
   }
 
@@ -46,7 +46,7 @@ class MaillogTestCase extends DrupalWebTestCase {
   /**
    * Confirm that SimpleTest has taken over the 'mail_system' variable.
    */
-  public function testSetup() {
+  public function _testSetup() {
     $enabled = variable_get('mail_system', array());
     $should_be = array(
       'default-system' => 'MaillogMailSystem',
@@ -64,17 +64,27 @@ class MaillogTestCase extends DrupalWebTestCase {
    * Tests logging mail with maillog module.
    */
   public function testLogging() {
-    $langcode = language_default('language');
+    // Login as an admin.
+    $this->loginAdminUser();
+
+    // Load the admin page.
+    $this->drupalGet('admin/reports/maillog');
+    $this->assertResponse(200);
+
+    // Confirm there are no emails present.
+    $this->assertText('Maillog is currently empty. Send an email!');
 
     // This is automatically assigned by Simpletest.
     $sender = 'simpletest@example.com';
 
-    // Send an email.
+    // Some other items to test.
     $from_email = 'from_test@example.com';
     $to_email = 'to_test@example.com';
-    $reply_email = 'reply_test@example.com';
-    $params = array();
-    drupal_mail('maillog_tests', 'maillog_basic_test', $to_email, $langcode, $params, $from_email);
+    $test_subject = 'Test email subject';
+    $test_body = "Test email body.\n";
+
+    // Send an email.
+    $this->sendTestEmail();
 
     // Compare the maillog db entry with the sent mail.
     $logged_email = $this->getLatestMaillogEntry();
@@ -85,21 +95,29 @@ class MaillogTestCase extends DrupalWebTestCase {
     $this->assertEqual($sender, $logged_email['header_all']['Sender'], 'Email "sender" header is correct.');
     $this->assertEqual($sender, $logged_email['header_all']['Return-Path'], 'Email "return-path" header is correct.');
     $this->assertEqual('Drupal', $logged_email['header_all']['X-Mailer'], 'Email "x-mailer" header is correct.');
-    $this->assertEqual(t('Test email subject'), $logged_email['subject'], 'Email subject is correct.');
-    $this->assertEqual(t('Test email body.') . "\n", $logged_email['body'], 'Email body is correct.');
+    $this->assertEqual($test_subject, $logged_email['subject'], 'Email subject is correct.');
+    $this->assertEqual($test_body, $logged_email['body'], 'Email body is correct.');
+
+    // Load the admin page again.
+    $this->drupalGet('admin/reports/maillog');
+    $this->assertResponse(200);
+
+    // Confirm the message is present.
+    $this->assertText($test_subject);
+    $this->assertText($from_email);
+    $this->assertText($to_email);
+
+    // Confirm the operations links are present.
+    $this->assertLink('view', 0, '"view" link found.');
+    $this->assertLink('delete', 0, '"delete" link found.');
   }
 
   /**
    * Confirm what happens with long subject lines.
    */
-  public function testLongSubject() {
-    $langcode = language_default('language');
-
+  public function _testLongSubject() {
     // Send an email.
-    $from_email = 'from_test@example.com';
-    $to_email = 'to_test@example.com';
-    $params = array();
-    drupal_mail('maillog_tests', 'maillog_long_subject_test', $to_email, $langcode, $params, $from_email);
+    $this->sendTestEmail('maillog_long_subject_test');
 
     // Compare the maillog db entry with the sent mail.
     $logged_email = $this->getLatestMaillogEntry();
@@ -118,15 +136,11 @@ class MaillogTestCase extends DrupalWebTestCase {
   /**
    * Confirm that it is not possible to create XSS attacks via an email subject.
    */
-  public function testSubjectXss() {
-    $langcode = language_default('language');
+  public function _testSubjectXss() {
     $xss_string = '<script type="text/javascript">alert("XSS test")</script>';
 
     // Send an email.
-    $from_email = 'from_test@example.com';
-    $to_email = 'to_test@example.com';
-    $params = array();
-    drupal_mail('maillog_tests', 'maillog_subject_xss_test', $to_email, $langcode, $params, $from_email);
+    $this->sendTestEmail('maillog_subject_xss_test');
 
     // Compare the maillog db entry with the sent mail.
     $logged_email = $this->getLatestMaillogEntry();
@@ -160,15 +174,11 @@ class MaillogTestCase extends DrupalWebTestCase {
   /**
    * Confirm that it is not possible to create XSS attacks via an email body.
    */
-  public function testBodyXss() {
-    $langcode = language_default('language');
+  public function _testBodyXss() {
     $xss_string = '<script type="text/javascript">alert("XSS test")</script>';
 
     // Send an email.
-    $from_email = 'from_test@example.com';
-    $to_email = 'to_test@example.com';
-    $params = array();
-    drupal_mail('maillog_tests', 'maillog_body_xss_test', $to_email, $langcode, $params, $from_email);
+    $this->sendTestEmail('maillog_body_xss_test');
 
     // Compare the maillog db entry with the sent mail.
     $logged_email = $this->getLatestMaillogEntry();
@@ -223,6 +233,7 @@ class MaillogTestCase extends DrupalWebTestCase {
     $permissions = array(
       'administer maillog',
       'view maillog',
+      'delete maillog',
       // General admin access.
       'access administration pages',
     );
@@ -233,6 +244,21 @@ class MaillogTestCase extends DrupalWebTestCase {
     cache_clear_all();
 
     return $this->drupalCreateUser($permissions);
+  }
+
+  /**
+   * Send a test email.
+   *
+   * @param string $key
+   *   The drupal_mail() key used to identify which message is being sent.
+   * @param array $params
+   *   Any additional parameters to process.
+   */
+  protected function sendTestEmail($key = 'maillog_basic_test', array $params = array()) {
+    $langcode = language_default('language');
+    $from_email = 'from_test@example.com';
+    $to_email = 'to_test@example.com';
+    drupal_mail('maillog_tests', $key, $to_email, $langcode, $params, $from_email);
   }
 
 }

@@ -36,7 +36,7 @@ function maillog_views_default_views() {
   $handler->display->display_options['empty']['area_text_custom']['field'] = 'area_text_custom';
   $handler->display->display_options['empty']['area_text_custom']['label'] = 'Maillog';
   $handler->display->display_options['empty']['area_text_custom']['empty'] = TRUE;
-  $handler->display->display_options['empty']['area_text_custom']['content'] = 'Maillog is currently empty. Send a mail!';
+  $handler->display->display_options['empty']['area_text_custom']['content'] = 'Maillog is currently empty. Send an email!';
   /* Field: Maillog: Maillog_ID */
   $handler->display->display_options['fields']['idmaillog']['id'] = 'idmaillog';
   $handler->display->display_options['fields']['idmaillog']['table'] = 'maillog';
@@ -85,7 +85,7 @@ function maillog_views_default_views() {
   $handler->display->display_options['fields']['nothing_1']['id'] = 'nothing_1';
   $handler->display->display_options['fields']['nothing_1']['table'] = 'views';
   $handler->display->display_options['fields']['nothing_1']['field'] = 'nothing';
-  $handler->display->display_options['fields']['nothing_1']['label'] = 'Actions';
+  $handler->display->display_options['fields']['nothing_1']['label'] = 'Operations';
   $handler->display->display_options['fields']['nothing_1']['alter']['text'] = '[nothing] | [delete_maillog]';
   /* Sort criterion: Maillog: Date */
   $handler->display->display_options['sorts']['sent_date']['id'] = 'sent_date';
