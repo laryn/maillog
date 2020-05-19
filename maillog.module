@@ -24,14 +24,17 @@ function maillog_permission() {
     'view maillog' => array(
       'title' => t('View Maillog'),
       'description' => t('Allow users to view a list of recently logged mails.'),
+      'restrict access' => TRUE,
     ),
     'delete maillog' => array(
       'title' => t('Delete Entries from the log'),
       'description' => t('Allow users to delete logged mails.'),
+      'restrict access' => TRUE,
     ),
     'administer maillog' => array(
       'title' => t('Administer Maillog'),
       'description' => t('Allow users to change maillog seetings.'),
+      'restrict access' => TRUE,
     ),
   );
 }

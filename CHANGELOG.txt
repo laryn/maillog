@@ -28,6 +28,7 @@ By DamienMcKenna: Added tests to confirm the list and view pages don't allow XSS
 #3137678 by DamienMcKenna: Add a CHANGELOG.txt file.
 #3137847 by DamienMcKenna: Rename test file.
 #3137869 by DamienMcKenna: 'delete' handler accidentally removed.
+#3137882 by DamienMcKenna: Make all permissions "restricted".
 
 
 Maillog 7.x-1.0-alpha1, 2014-07-14
