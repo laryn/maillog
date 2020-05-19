@@ -83,7 +83,7 @@ function maillog_menu() {
  * Title callback for a maillog record.
  *
  * @param array $maillog
- *   A maillog record that is to be deleted with an 'idmaillog' value.
+ *   A maillog record that is to be deleted with an 'id' value.
  *
  * @return string
  *   The title of a specific message.
@@ -95,15 +95,15 @@ function maillog_maillog_title(array $maillog) {
 /**
  * Load a maillog record.
  *
- * @param int $idmaillog
+ * @param int $id
  *   The primary ID for a Maillog record.
  *
  * @return null|array
  *   An array containing the {maillog} record if found, NULL if not.
  */
-function maillog_maillog_load($idmaillog) {
-  $result = db_query("SELECT idmaillog, header_from, header_to, header_reply_to, header_all, subject, body FROM {maillog} WHERE idmaillog=:id", array(
-    ':id' => $idmaillog,
+function maillog_maillog_load($id) {
+  $result = db_query("SELECT id, header_from, header_to, header_reply_to, header_all, subject, body FROM {maillog} WHERE id=:id", array(
+    ':id' => $id,
   ));
   if ($result == FALSE) {
     $maillog = NULL;
@@ -119,14 +119,14 @@ function maillog_maillog_load($idmaillog) {
 /**
  * Delete a specific maillog record.
  *
- * @param int $idmaillog
+ * @param int $id
  *   The primary ID for a maillog record.
  *
  * @return DatabaseStatementInterface
  *   The response from db_query().
  */
-function maillog_maillog_delete($idmaillog) {
-  return db_query("DELETE FROM {maillog} WHERE idmaillog = :id", array(':id' => $idmaillog));
+function maillog_maillog_delete($id) {
+  return db_query("DELETE FROM {maillog} WHERE id = :id", array(':id' => $id));
 }
 
 /**

@@ -18,7 +18,7 @@ class MaillogHandlerFieldMaillogLinkDelete extends views_handler_field {
    */
   public function construct() {
     parent::construct();
-    $this->additional_fields['idmaillog'] = 'idmaillog';
+    $this->additional_fields['id'] = 'id';
   }
 
   /**
@@ -38,7 +38,7 @@ class MaillogHandlerFieldMaillogLinkDelete extends views_handler_field {
       return;
     }
     $text = !empty($this->options['text']) ? $this->options['text'] : t('delete');
-    return l($text, "maillog/delete/$values->idmaillog", array('query' => drupal_get_destination()));
+    return l($text, "maillog/delete/{$values->id}", array('query' => drupal_get_destination()));
   }
 
 }

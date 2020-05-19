@@ -24,7 +24,7 @@ function maillog_maillog_page(array $maillog) {
 function maillog_maillog_delete_form($form, &$form_state, $maillog) {
   $form['id'] = array(
     '#type' => 'value',
-    '#value' => $maillog['idmaillog'],
+    '#value' => $maillog['id'],
   );
 
   // Show some details of the email message.

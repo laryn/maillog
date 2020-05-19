@@ -46,7 +46,7 @@ class MaillogTestCase extends DrupalWebTestCase {
   /**
    * Confirm that SimpleTest has taken over the 'mail_system' variable.
    */
-  public function _testSetup() {
+  public function testSetup() {
     $enabled = variable_get('mail_system', array());
     $should_be = array(
       'default-system' => 'MaillogMailSystem',
@@ -63,7 +63,7 @@ class MaillogTestCase extends DrupalWebTestCase {
   /**
    * Tests logging mail with maillog module.
    */
-  public function _testLogging() {
+  public function testLogging() {
     // Login as an admin.
     $this->loginAdminUser();
 
@@ -115,7 +115,7 @@ class MaillogTestCase extends DrupalWebTestCase {
   /**
    * Confirm what happens with long subject lines.
    */
-  public function _testLongSubject() {
+  public function testLongSubject() {
     // Send an email.
     $this->sendTestEmail('maillog_long_subject_test');
 
@@ -136,7 +136,7 @@ class MaillogTestCase extends DrupalWebTestCase {
   /**
    * Confirm that it is not possible to create XSS attacks via an email subject.
    */
-  public function _testSubjectXss() {
+  public function testSubjectXss() {
     $xss_string = '<script type="text/javascript">alert("XSS test")</script>';
 
     // Send an email.
@@ -159,7 +159,7 @@ class MaillogTestCase extends DrupalWebTestCase {
     $this->assertNoRaw($xss_string);
 
     // Load the maillog view page.
-    $this->drupalGet('maillog/details/' . $logged_email['idmaillog']);
+    $this->drupalGet('maillog/details/' . $logged_email['id']);
     $this->assertResponse(200);
 
     // Confirm that the page has been defanged.
@@ -174,7 +174,7 @@ class MaillogTestCase extends DrupalWebTestCase {
   /**
    * Confirm that it is not possible to create XSS attacks via an email body.
    */
-  public function _testBodyXss() {
+  public function testBodyXss() {
     $xss_string = '<script type="text/javascript">alert("XSS test")</script>';
 
     // Send an email.
@@ -188,7 +188,7 @@ class MaillogTestCase extends DrupalWebTestCase {
     $this->loginAdminUser();
 
     // Load the maillog view page.
-    $this->drupalGet('maillog/details/' . $logged_email['idmaillog']);
+    $this->drupalGet('maillog/details/' . $logged_email['id']);
     $this->assertResponse(200);
 
     // The body field will be passed through check_plain, which will remove all
@@ -217,7 +217,7 @@ class MaillogTestCase extends DrupalWebTestCase {
     $this->loginAdminUser();
 
     // Load the 'delete' path for one of the items..
-    $this->drupalGet('maillog/delete/' . $messages[0]['idmaillog']);
+    $this->drupalGet('maillog/delete/' . $messages[0]['id']);
     $this->assertResponse(200);
 
     // Confirm the page is a confirmation page.
@@ -249,7 +249,7 @@ class MaillogTestCase extends DrupalWebTestCase {
    *   Maillog entry.
    */
   protected function getLatestMaillogEntry() {
-    $query = 'SELECT idmaillog, header_from, header_to, header_reply_to, header_all, subject, body FROM {maillog} ORDER BY idmaillog DESC';
+    $query = 'SELECT id, header_from, header_to, header_reply_to, header_all, subject, body FROM {maillog} ORDER BY id DESC';
     $result = db_query_range($query, 0, 1);
 
     if ($maillog = $result->fetchAssoc()) {
@@ -266,7 +266,7 @@ class MaillogTestCase extends DrupalWebTestCase {
    *   A list of Maillog entries.
    */
   protected function getAllMaillogEntries() {
-    $query = 'SELECT idmaillog, header_from, header_to, header_reply_to, header_all, subject, body FROM {maillog} ORDER BY idmaillog ASC';
+    $query = 'SELECT id, header_from, header_to, header_reply_to, header_all, subject, body FROM {maillog} ORDER BY id ASC';
     $results = db_query($query);
 
     $messages = array();

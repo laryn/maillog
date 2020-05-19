@@ -53,7 +53,7 @@ class Maillog implements DrupalSubContextInterface {
    */
   public function setLastId() {
     if (module_exists('maillog')) {
-      $this->lastId = (int) db_query('SELECT MAX(idmaillog) FROM {maillog}')->fetchField();
+      $this->lastId = (int) db_query('SELECT MAX(id) FROM {maillog}')->fetchField();
     }
   }
 
@@ -65,10 +65,10 @@ class Maillog implements DrupalSubContextInterface {
 
     $actual_emails = db_select('maillog', 'm')
       ->fields('m')
-      ->condition('idmaillog', $this->lastId, '>')
-      ->orderBy('idmaillog', 'DESC')
+      ->condition('id', $this->lastId, '>')
+      ->orderBy('id', 'DESC')
       ->execute()
-      ->fetchAllAssoc('idmaillog', PDO::FETCH_ASSOC);
+      ->fetchAllAssoc('id', PDO::FETCH_ASSOC);
 
     if (count($actual_emails) < $num) {
       throw new Exception('Only ' . count($actual_emails) . ' were sent.');

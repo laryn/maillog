@@ -77,13 +77,13 @@ function maillog_disable() {
  */
 function maillog_schema() {
   $schema['maillog'] = array(
-    'description' => "Stores outgoing e-mail details for nodes of type 'maillog'.",
+    'description' => "Stores outgoing emails that are captured using the Maillog module.",
     'fields' => array(
-      'idmaillog' => array(
+      'id' => array(
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
-        'description' => "The mail_log {node}.nid",
+        'description' => "The primary key of this table.",
       ),
       'header_message_id' => array(
         'type' => 'varchar',
@@ -113,14 +113,14 @@ function maillog_schema() {
         'description' => "The 'Header' field of the e-mail.",
       ),
       'subject' => array(
-        'description' => "The 'Subject' fieldof the e-mail.",
+        'description' => "The 'Subject' field of the e-mail.",
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => '',
       ),
       'body' => array(
-        'description' => 'The body of this version.',
+        'description' => 'The body of this message.',
         'type' => 'text',
         'not null' => TRUE,
         'size' => 'big',
@@ -132,7 +132,7 @@ function maillog_schema() {
         'default' => 0,
       ),
     ),
-    'primary key' => array('idmaillog'),
+    'primary key' => array('id'),
   );
 
   return $schema;
@@ -146,4 +146,35 @@ function maillog_uninstall() {
   variable_del('maillog_log');
   variable_del('maillog_send');
   variable_del('maillog_engine');
+}
+
+/**
+ * Implementations of hook_update_N().
+ */
+
+/**
+ * Rename the 'idmaillog' column to just 'id'.
+ *
+ * Order of operations taken from the API documentation for db_change_field().
+ *
+ * @see https://api.drupal.org/api/drupal/includes%21database%21database.inc/function/db_change_field/7.x
+ */
+function maillog_update_7100() {
+  if (!db_field_exists('maillog', 'id')) {
+    // Delete the primary key.
+    db_drop_primary_key('maillog');
+
+    // Rename the existing 'idmaillog' column to just 'id', and make it the
+    // primary key.
+    $spec = array(
+      'type' => 'serial',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+      'description' => "The primary key of this table.",
+    );
+    $keys = array(
+      'primary key' => array('id'),
+    );
+    db_change_field('maillog', 'idmaillog', 'id', $spec, $keys);
+  }
 }

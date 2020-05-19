@@ -31,6 +31,7 @@ By DamienMcKenna: Added tests to confirm the list and view pages don't allow XSS
 #3137882 by DamienMcKenna: Make all permissions "restricted".
 #3137869 by DamienMcKenna: Re-enable all tests methods accidentally disabled.
 #1401818 by DamienMcKenna: Test coverage for message deletion.
+#3137940 by DamienMcKenna: Rename "idmaillog" field and variable usage to "id".
 
 
 Maillog 7.x-1.0-alpha1, 2014-07-14

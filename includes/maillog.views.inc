@@ -12,14 +12,14 @@ function maillog_views_data() {
   $data['maillog']['table']['group'] = t('Maillog');
 
   $data['maillog']['table']['base'] = array(
-    'field' => 'idmaillog',
+    'field' => 'id',
     'title' => t('Maillog'),
     'help' => t("This table contains the logged e-mails."),
     'weight' => -10,
   );
 
-  $data['maillog']['idmaillog'] = array(
-    'title' => t('Maillog_ID'),
+  $data['maillog']['id'] = array(
+    'title' => t('Maillog ID'),
     'help' => t('The primary key of the maillog table.'),
     'field' => array(
       'handler' => 'views_handler_field',
