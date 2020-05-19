@@ -46,7 +46,7 @@ class MaillogTestCase extends DrupalWebTestCase {
   /**
    * Confirm that SimpleTest has taken over the 'mail_system' variable.
    */
-  public function _testSetup() {
+  public function testSetup() {
     $enabled = variable_get('mail_system', array());
     $should_be = array(
       'default-system' => 'MaillogMailSystem',
@@ -115,7 +115,7 @@ class MaillogTestCase extends DrupalWebTestCase {
   /**
    * Confirm what happens with long subject lines.
    */
-  public function _testLongSubject() {
+  public function testLongSubject() {
     // Send an email.
     $this->sendTestEmail('maillog_long_subject_test');
 
@@ -136,7 +136,7 @@ class MaillogTestCase extends DrupalWebTestCase {
   /**
    * Confirm that it is not possible to create XSS attacks via an email subject.
    */
-  public function _testSubjectXss() {
+  public function testSubjectXss() {
     $xss_string = '<script type="text/javascript">alert("XSS test")</script>';
 
     // Send an email.
@@ -174,7 +174,7 @@ class MaillogTestCase extends DrupalWebTestCase {
   /**
    * Confirm that it is not possible to create XSS attacks via an email body.
    */
-  public function _testBodyXss() {
+  public function testBodyXss() {
     $xss_string = '<script type="text/javascript">alert("XSS test")</script>';
 
     // Send an email.
