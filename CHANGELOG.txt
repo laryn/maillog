@@ -1,4 +1,4 @@
-Maillog 7.x-1.x-dev, xxxx-xx-xx
+Maillog 7.x-1.0-rc1, 2020-05-19
 -------------------------------
 #2655518 by DamienMcKenna: Added some tests.
 #2601710 by DamienMcKenna, monika.kadam1206: Updated the README.txt file.
