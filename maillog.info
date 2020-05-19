@@ -12,4 +12,4 @@ files[] = includes/maillog_handler_field_maillog_entry_link_delete.inc
 files[] = includes/maillog_handler_field_maillog_link_delete.inc
 
 ; Tests.
-files[] = tests/maillog.unit.test
+files[] = tests/MaillogTestCase.test

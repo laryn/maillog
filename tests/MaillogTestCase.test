@@ -8,14 +8,14 @@
 /**
  * All unit tests for the module.
  */
-class MaillogUnitTest extends DrupalWebTestCase {
+class MaillogTestCase extends DrupalWebTestCase {
 
   /**
    * {@inheritdoc}
    */
   public static function getInfo() {
     return array(
-      'name' => 'Maillog unit tests',
+      'name' => 'Maillog tests',
       'description' => 'Test the main Maillog functionality.',
       'group' => 'Maillog',
     );
