@@ -31,8 +31,6 @@ function maillog_enable() {
   // clear after the default views are loaded in order for the menu item to
   // become active.
   global $language;
-  cache_clear_all('ctools_plugin_files:ctools:export_ui', 'cache');
-  cache_clear_all('ctools_plugin_type_info', 'cache');
   cache_clear_all('views:plugin_data:' . $language->langcode, 'cache');
   state_set('menu_rebuild_needed', TRUE);
 }
@@ -141,7 +139,7 @@ function maillog_schema() {
 }
 
 /**
- * Update webforms from Drupal to Backdrop.
+ * Update variables from Drupal to config in Backdrop.
  */
 function maillog_update_1000() {
   $config = config('maillog.settings');
@@ -155,8 +153,8 @@ function maillog_update_1000() {
   $config->save();
 
   // Delete variables.
-  update_variable_del('maillog_');
-  update_variable_del('maillog_');
-  update_variable_del('maillog_');
-  update_variable_del('maillog_');
+  update_variable_del('maillog_send');
+  update_variable_del('maillog_log');
+  update_variable_del('maillog_devel');
+  update_variable_del('maillog_engine');
 }
