@@ -16,8 +16,8 @@ function maillog_enable() {
   $mail_system['default-system'] = config_get('system.mail', 'default-system');
   $mail_system['maillog'] = 'MaillogMailSystem';
 
-  // If maillog is enabled, don't take over the default
-  if ($mail_system['default-system'] != $default_class) {
+  // Only take over if the settings are still default.
+  if ($mail_system['default-system'] == $default_class) {
     $mail_system['default-system'] = $mail_system['maillog'];
   }
   else {
@@ -123,7 +123,7 @@ function maillog_schema() {
         'description' => 'The body of this version.',
         'type' => 'text',
         'not null' => TRUE,
-        'size' => 'big'
+        'size' => 'big',
       ),
       'sent_date' => array(
         'description' => 'The Unix timestamp when the mail was sent.',
@@ -139,12 +139,21 @@ function maillog_schema() {
 }
 
 /**
+ * Implements hook_uninstall().
+ */
+function maillog_uninstall() {
+  if (db_table_exists('maillog')) {
+    db_drop_table('maillog');
+  }
+}
+
+/**
  * Update variables from Drupal to config in Backdrop.
  */
 function maillog_update_1000() {
   $config = config('maillog.settings');
 
-  // migrate variables
+  // Migrate variables.
   $config->set('maillog_send', update_variable_get('maillog_send', TRUE));
   $config->set('maillog_log', update_variable_get('maillog_log', TRUE));
   $config->set('maillog_devel', update_variable_get('maillog_devel', TRUE));
