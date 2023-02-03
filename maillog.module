@@ -65,7 +65,7 @@ function maillog_menu() {
   $items = array();
 
   $items['admin/config/development/maillog'] = array(
-    'title' => t('Maillog Settings'),
+    'title' => t('Maillog settings'),
     'description' => t('Configure the settings of Maillog module.'),
     'page callback' => 'backdrop_get_form',
     'page arguments' => array('maillog_admin_settings'),
@@ -124,7 +124,7 @@ function maillog_maillog_load($idmaillog) {
   }
   else {
     $maillog = $result->fetchAssoc();
-    // unserialize values
+    // Unserialize values.
     $maillog['header_all'] = unserialize($maillog['header_all']);
   }
   return $maillog;
@@ -188,7 +188,7 @@ function maillog_admin_settings() {
 
   if (module_exists('mailsystem')) {
     $mailsystem_classes = mailsystem_get_classes();
-    // maillog will be unset, because it would cause an recursion
+    // Maillog will be unset, because it would cause an recursion.
     unset($mailsystem_classes['MaillogMailSystem']);
     $form['maillog_engine'] = array(
       '#type' => 'select',
@@ -197,6 +197,14 @@ function maillog_admin_settings() {
       '#options' => $mailsystem_classes,
     );
   }
+
+  $form['maillog_row_limit'] = array(
+    '#type' => 'select',
+    '#title' => t('Maillog messages to keep'),
+    '#default_value' => $config->get('maillog_row_limit'),
+    '#options' => array(0 => t('All')) + backdrop_map_assoc(array(100, 1000, 10000)),
+    '#description' => t('The maximum number of messages to keep in the maillog. Requires cron.'),
+  );
 
   return system_settings_form($form);
 }
@@ -328,8 +336,37 @@ function theme_maillog_body($variables) {
   $output .= '<pre>';
   $output .= check_plain($variables['body']);
   $output .= '</pre>';
-  $output .=  '</div>';
+  $output .= '</div>';
   $output .= '</div>';
 
   return $output;
+}
+
+
+/**
+ * Implements hook_cron().
+ *
+ * Controls the size of the maillog table.
+ */
+function maillog_cron() {
+  // Cleanup the maillog table.
+  $row_limit = config_get('maillog.settings', 'maillog_row_limit');
+
+  // For row limit n, get the wid of the nth row in descending wid order.
+  // Counting the most recent n rows avoids issues with wid number sequences,
+  // e.g. auto_increment value > 1 or rows deleted directly from the table.
+  if ($row_limit > 0) {
+    $min_row = db_select('maillog', 'm')
+      ->fields('m', array('idmaillog'))
+      ->orderBy('idmaillog', 'DESC')
+      ->range($row_limit - 1, 1)
+      ->execute()->fetchField();
+
+    // Delete all table entries older than the nth row, if nth row was found.
+    if ($min_row) {
+      db_delete('maillog')
+        ->condition('idmaillog', $min_row, '<')
+        ->execute();
+    }
+  }
 }
