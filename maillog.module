@@ -165,6 +165,23 @@ function maillog_theme() {
   );
 }
 
+function maillog_cron() {
+  $duration = variable_get('maillog_delete_time', 0);
+
+  if (!empty($duration)) {
+    //Get cut off time
+    $delete_time = time() - $duration;
+
+    //Delete all that are older than cut off time
+    $query = db_delete('maillog')
+      ->condition('sent_date', $delete_time, '<');
+    dpq($query);
+    $query->execute();
+    watchdog('mailog', 'Deleted Mailog logs older than !time', array('!time' => date('r', $delete_time)));
+  }
+  return;
+}
+
 /**
  * Render a maillog record.
  */

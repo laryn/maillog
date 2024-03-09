@@ -142,10 +142,12 @@ function maillog_schema() {
  * Implements hook_uninstall().
  */
 function maillog_uninstall() {
+  variable_del('maillog_body');
+  variable_del('maillog_delete_time');
   variable_del('maillog_devel');
+  variable_del('maillog_engine');
   variable_del('maillog_log');
   variable_del('maillog_send');
-  variable_del('maillog_engine');
 }
 
 /**

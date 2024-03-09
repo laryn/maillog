@@ -1,5 +1,7 @@
 Maillog 7.x-1.x-dev, 2024-xx-xx
 -------------------------------
+#1662752 by Eduardo Morales Alberti, pluess, joe-b, miro_dietiker, seanr,
+  DamienMcKenna, Maedi: Maillog log table size escalation.
 
 
 Maillog 7.x-1.0-rc1, 2020-05-19

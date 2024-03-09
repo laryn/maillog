@@ -61,9 +61,20 @@ class MaillogMailSystem implements MailSystemInterface {
       $record->subject = $message['subject'];
       $record->subject = mime_header_decode($record->subject);
       $record->subject = drupal_substr($record->subject, 0, 255);
-      $record->body = $message['body'];
       $record->header_from = isset($message['from']) ? $message['from'] : NULL;
       $record->header_from = mime_header_decode($record->header_from);
+
+      // Compile the body text for the log.
+      switch (variable_get('maillog_body', 'all')) {
+        case 'all':
+          $record->body = $message['body'];
+          break;
+        case 'partial':
+          $record->body = substr($message['body'], 0, 512);
+          break;
+        default:
+          $record->body = 'not logged';
+      }
 
       $header_to = array();
       if (isset($message['to'])) {
