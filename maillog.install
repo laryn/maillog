@@ -2,11 +2,11 @@
 
 /**
  * @file
- * Provides the installation routines for the maillog module
+ * Provides the installation routines for the maillog module.
  */
 
 /**
- * Implementation of hook_enable().
+ * Implements hook_enable().
  */
 function maillog_enable() {
   // The system default class.
@@ -36,7 +36,7 @@ function maillog_enable() {
 }
 
 /**
- * Implementation of hook_disable().
+ * Implements hook_disable().
  */
 function maillog_disable() {
   // Get the current mail system config.
@@ -73,54 +73,54 @@ function maillog_disable() {
 }
 
 /**
- * Implementation of hook_schema().
+ * Implements hook_schema().
  */
 function maillog_schema() {
   $schema['maillog'] = array(
-    'description' => t("Stores outgoing e-mail details for nodes of type 'maillog'."),
+    'description' => "Stores outgoing emails that are captured using the Maillog module.",
     'fields' => array(
-      'idmaillog' => array(
+      'id' => array(
         'type' => 'serial',
         'unsigned' => TRUE,
         'not null' => TRUE,
-        'description' => t("The mail_log {node}.nid"),
+        'description' => "The primary key of this table.",
       ),
       'header_message_id' => array(
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => '',
-        'description' => t("The 'message-id' field of the e-mail."),
+        'description' => "The 'message-id' field of the e-mail.",
       ),
       'header_from' => array(
         'type' => 'text',
         'not null' => TRUE,
-        'description' => t("The 'From' field of the e-mail."),
+        'description' => "The 'From' field of the e-mail.",
       ),
       'header_to' => array(
         'type' => 'text',
         'not null' => TRUE,
-        'description' => t("The 'To' field of the e-mail."),
+        'description' => "The 'To' field of the e-mail.",
       ),
       'header_reply_to' => array(
         'type' => 'text',
         'not null' => TRUE,
-        'description' => t("The 'Reply-To' field of the e-mail."),
+        'description' => "The 'Reply-To' field of the e-mail.",
       ),
       'header_all' => array(
         'type' => 'text',
         'not null' => TRUE,
-        'description' => t("The 'Header' field of the e-mail."),
+        'description' => "The 'Header' field of the e-mail.",
       ),
       'subject' => array(
-        'description' => t("The 'Subject' fieldof the e-mail."),
+        'description' => "The 'Subject' field of the e-mail.",
         'type' => 'varchar',
         'length' => 255,
         'not null' => TRUE,
         'default' => '',
       ),
       'body' => array(
-        'description' => 'The body of this version.',
+        'description' => 'The body of this message.',
         'type' => 'text',
         'not null' => TRUE,
         'size' => 'big',
@@ -132,7 +132,7 @@ function maillog_schema() {
         'default' => 0,
       ),
     ),
-    'primary key' => array('idmaillog'),
+    'primary key' => array('id'),
   );
 
   return $schema;
@@ -159,6 +159,8 @@ function maillog_update_1000() {
   $config->set('maillog_devel', update_variable_get('maillog_devel', TRUE));
   $config->set('maillog_engine', update_variable_get('maillog_engine', 'DefaultMailSystem'));
   $config->set('maillog_row_limit', update_variable_get('maillog_row_limit', 1000));
+  $config->set('maillog_delete_time', update_variable_get('maillog_delete_time', 0));
+  $config->set('maillog_body', update_variable_get('maillog_body', 'all'));
 
   $config->save();
 
@@ -168,6 +170,8 @@ function maillog_update_1000() {
   update_variable_del('maillog_devel');
   update_variable_del('maillog_engine');
   update_variable_del('maillog_row_limit');
+  update_variable_del('maillog_delete_time');
+  update_variable_del('maillog_body');
 }
 
 /**
@@ -181,4 +185,22 @@ function maillog_update_1100() {
     $config->set('maillog_row_limit', 1000);
     $config->save();
   }
+}
+
+/**
+* Ensure values for new config settings; Clear Menu and Views cache so the new
+* paths will be picked up.
+ */
+function maillog_update_1101() {
+  $config = config('maillog.settings');
+  if (empty($config->get('maillog_body'))) {
+    $config->set('maillog_body', 'all');
+  }
+  if (empty($config->get('maillog_delete_time'))) {
+    $config->set('maillog_delete_time', 0);
+  }
+  $config->save();
+  state_set('menu_rebuild_needed', TRUE);
+  cache_clear_all('*', 'cache_views', TRUE);
+  cache_clear_all('*', 'cache_views_data', TRUE);
 }

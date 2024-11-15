@@ -3,5 +3,7 @@
     "maillog_send": 1,
     "maillog_log": 1,
     "maillog_devel": 1,
-    "maillog_engine": "DefaultMailSystem"
+    "maillog_engine": "DefaultMailSystem",
+    "maillog_body": "all",
+    "maillog_delete_time": 0
 }

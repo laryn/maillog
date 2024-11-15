@@ -1,15 +1,19 @@
 <?php
+
 /**
  * @file
  * Unit-ish tests for the Maillog module.
  */
 
-class MaillogUnitTest extends BackdropWebTestCase {
+/**
+ * All unit tests for the module.
+ */
+class MaillogTestCase extends BackdropWebTestCase {
 
   /**
    * {@inheritdoc}
    */
-  function setUp(array $modules = array()) {
+  public function setUp(array $modules = array()) {
     // Requirements.
     $modules[] = 'maillog';
 
@@ -31,7 +35,7 @@ class MaillogUnitTest extends BackdropWebTestCase {
   /**
    * Confirm that SimpleTest has taken over the 'mail_system' variable.
    */
-  function testSetup() {
+  public function testSetup() {
     $enabled = config_get('system.mail', 'default-system');
     $should_be = 'MaillogMailSystem';
     $this->assertEqual($enabled, $should_be, 'Maillog is controlling mail delivery.');
@@ -47,43 +51,61 @@ class MaillogUnitTest extends BackdropWebTestCase {
    * Tests logging mail with maillog module.
    */
   public function testLogging() {
-    $langcode = language_default('language');
+    // Login as an admin.
+    $this->loginAdminUser();
+
+    // Load the admin page.
+    $this->backdropGet('admin/reports/maillog');
+    $this->assertResponse(200);
+
+    // Confirm there are no emails present.
+    $this->assertText('Maillog is currently empty. Send an email!');
 
     // This is automatically assigned by Simpletest.
     $sender = 'simpletest@example.com';
 
-    // Send an email.
+    // Some other items to test.
     $from_email = 'from_test@example.com';
     $to_email = 'to_test@example.com';
-    $reply_email = 'reply_test@example.com';
-    $params = array();
-    backdrop_mail('maillog_tests', 'maillog_basic_test', $to_email, $langcode, $params, $from_email);
+    $test_subject = 'Test email subject';
+    $test_body = "Test email body.\n";
+
+    // Send an email.
+    $this->sendTestEmail();
 
     // Compare the maillog db entry with the sent mail.
     $logged_email = $this->getLatestMaillogEntry();
     $this->assertTrue(!empty($logged_email), 'The test email was captured.');
     $this->assertEqual($to_email, $logged_email['header_to'], 'Email "to" address is correct.');
     $this->assertEqual($sender, $logged_email['header_from'], 'Email "from" address is correct.');
-    $this->assertEqual($from_email, $logged_email['header_all']['Reply-to'], 'Email "from" address is correct.');
+    $this->assertEqual($from_email, $logged_email['header_all']['Reply-To'], 'Email "from" address is correct.');
     $this->assertEqual($sender, $logged_email['header_all']['From'], 'Email "from" header is correct.');
     $this->assertEqual($sender, $logged_email['header_all']['Sender'], 'Email "sender" header is correct.');
     $this->assertEqual($sender, $logged_email['header_all']['Return-Path'], 'Email "return-path" header is correct.');
     $this->assertEqual('Backdrop CMS', $logged_email['header_all']['X-Mailer'], 'Email "x-mailer" header is correct.');
-    $this->assertEqual(t('Test email subject'), $logged_email['subject'], 'Email subject is correct.');
-    $this->assertEqual(t('Test email body.') . "\n", $logged_email['body'], 'Email body is correct.');
+    $this->assertEqual($test_subject, $logged_email['subject'], 'Email subject is correct.');
+    $this->assertEqual($test_body, $logged_email['body'], 'Email body is correct.');
+
+    // Load the admin page again.
+    $this->backdropGet('admin/reports/maillog');
+    $this->assertResponse(200);
+
+    // Confirm the message is present.
+    $this->assertText($test_subject);
+    $this->assertText($from_email);
+    $this->assertText($to_email);
+
+    // Confirm the operations links are present.
+    $this->assertLink('view', 0, '"view" link found.');
+    $this->assertLink('delete', 0, '"delete" link found.');
   }
 
   /**
    * Confirm what happens with long subject lines.
    */
   public function testLongSubject() {
-    $langcode = language_default('language');
-
     // Send an email.
-    $from_email = 'from_test@example.com';
-    $to_email = 'to_test@example.com';
-    $params = array();
-    backdrop_mail('maillog_tests', 'maillog_long_subject_test', $to_email, $langcode, $params, $from_email);
+    $this->sendTestEmail('maillog_long_subject_test');
 
     // Compare the maillog db entry with the sent mail.
     $logged_email = $this->getLatestMaillogEntry();
@@ -102,15 +124,11 @@ class MaillogUnitTest extends BackdropWebTestCase {
   /**
    * Confirm that it is not possible to create XSS attacks via an email subject.
    */
-  public function testSubjectXSS() {
-    $langcode = language_default('language');
+  public function testSubjectXss() {
     $xss_string = '<script type="text/javascript">alert("XSS test")</script>';
 
     // Send an email.
-    $from_email = 'from_test@example.com';
-    $to_email = 'to_test@example.com';
-    $params = array();
-    backdrop_mail('maillog_tests', 'maillog_subject_xss_test', $to_email, $langcode, $params, $from_email);
+    $this->sendTestEmail('maillog_subject_xss_test');
 
     // Compare the maillog db entry with the sent mail.
     $logged_email = $this->getLatestMaillogEntry();
@@ -129,7 +147,7 @@ class MaillogUnitTest extends BackdropWebTestCase {
     $this->assertNoRaw($xss_string);
 
     // Load the maillog view page.
-    $this->backdropGet('maillog/details/' . $logged_email['idmaillog']);
+    $this->backdropGet('admin/reports/maillog/view/' . $logged_email['id']);
     $this->assertResponse(200);
 
     // Confirm that the page has been defanged.
@@ -144,15 +162,11 @@ class MaillogUnitTest extends BackdropWebTestCase {
   /**
    * Confirm that it is not possible to create XSS attacks via an email body.
    */
-  public function testBodyXSS() {
-    $langcode = language_default('language');
+  public function testBodyXss() {
     $xss_string = '<script type="text/javascript">alert("XSS test")</script>';
 
     // Send an email.
-    $from_email = 'from_test@example.com';
-    $to_email = 'to_test@example.com';
-    $params = array();
-    backdrop_mail('maillog_tests', 'maillog_body_xss_test', $to_email, $langcode, $params, $from_email);
+    $this->sendTestEmail('maillog_body_xss_test');
 
     // Compare the maillog db entry with the sent mail.
     $logged_email = $this->getLatestMaillogEntry();
@@ -162,7 +176,7 @@ class MaillogUnitTest extends BackdropWebTestCase {
     $this->loginAdminUser();
 
     // Load the maillog view page.
-    $this->backdropGet('maillog/details/' . $logged_email['idmaillog']);
+    $this->backdropGet('admin/reports/maillog/view/' . $logged_email['id']);
     $this->assertResponse(200);
 
     // The body field will be passed through check_plain, which will remove all
@@ -176,13 +190,54 @@ class MaillogUnitTest extends BackdropWebTestCase {
   }
 
   /**
+   * Confirm that the 'delete' pages are not able to delete messages.
+   */
+  public function testDeletePageSecurity() {
+    // Send some test emails.
+    $this->sendTestEmail();
+    $this->sendTestEmail();
+
+    // Load the message log data to confirm the records were created.
+    $messages = $this->getAllMaillogEntries();
+    $this->assertEqual(count($messages), 2, 'Two messages are in the maillog.');
+
+    // Log in as the admin.
+    $this->loginAdminUser();
+
+    // Load the 'delete' path for one of the items..
+    $this->backdropGet('admin/reports/maillog/delete/' . $messages[0]['id']);
+    $this->assertResponse(200);
+
+    // Confirm the page is a confirmation page.
+    $this->assertText('Delete Maillog record?');
+    $this->assertText('Message details');
+    $this->assertText('This action cannot be undone.');
+    $this->assertFieldByName('subject');
+    $this->assertFieldByName('to');
+    $this->assertFieldByName('op', 'Confirm');
+    $this->assertLink('Cancel');
+
+    // Confirm that just loading the delete page doesn't delete anything.
+    $messages = $this->getAllMaillogEntries();
+    $this->assertEqual(count($messages), 2, 'There are still two messages in the maillog.');
+
+    // Follow the 'delete' action.
+    $this->backdropPost(NULL, array(), 'Confirm');
+    $this->assertResponse(200);
+
+    // Confirm that only one message is left.
+    $messages = $this->getAllMaillogEntries();
+    $this->assertTrue(count($messages) === 1, 'There is now only one message in the maillog.');
+  }
+
+  /**
    * Gets the latest Maillog entry.
    *
    * @return array
    *   Maillog entry.
    */
   protected function getLatestMaillogEntry() {
-    $query = 'SELECT idmaillog, header_from, header_to, header_reply_to, header_all, subject, body FROM {maillog} ORDER BY idmaillog DESC';
+    $query = 'SELECT id, header_from, header_to, header_reply_to, header_all, subject, body FROM {maillog} ORDER BY id DESC';
     $result = db_query_range($query, 0, 1);
 
     if ($maillog = $result->fetchAssoc()) {
@@ -193,9 +248,49 @@ class MaillogUnitTest extends BackdropWebTestCase {
   }
 
   /**
+   * Gets all Maillog entries.
+   *
+   * @return array
+   *   A list of Maillog entries.
+   */
+  protected function getAllMaillogEntries() {
+    $query = 'SELECT id, header_from, header_to, header_reply_to, header_all, subject, body FROM {maillog} ORDER BY id ASC';
+    $results = db_query($query);
+
+    $messages = array();
+    if (!empty($results)) {
+      while ($message = $results->fetchAssoc()) {
+        // Unserialize values.
+        $this->verbose($message);
+        $message['header_all'] = unserialize($message['header_all']);
+        $messages[] = $message;
+      }
+    }
+
+    return $messages;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function verbose($message, $title = NULL) {
+    // Handle arrays, objects, etc.
+    if (!is_string($message)) {
+      $message = "<pre>\n" . print_r($message, TRUE) . "\n</pre>\n";
+    }
+
+    // Optional title to go before the output.
+    if (!empty($title)) {
+      $title = '<h2>' . check_plain($title) . "</h2>\n";
+    }
+
+    parent::verbose($title . $message);
+  }
+
+  /**
    * Log into the site as an admin user.
    */
-  function loginAdminUser() {
+  public function loginAdminUser() {
     $user = $this->createAdminUser();
     $this->backdropLogin($user);
   }
@@ -203,10 +298,11 @@ class MaillogUnitTest extends BackdropWebTestCase {
   /**
    * Create an admin account.
    */
-  function createAdminUser() {
+  public function createAdminUser() {
     $permissions = array(
       'administer maillog',
       'view maillog',
+      'delete maillog',
       // General admin access.
       'access administration pages',
     );
@@ -217,6 +313,21 @@ class MaillogUnitTest extends BackdropWebTestCase {
     cache_clear_all();
 
     return $this->backdropCreateUser($permissions);
+  }
+
+  /**
+   * Send a test email.
+   *
+   * @param string $key
+   *   The backdrop_mail() key used to identify which message is being sent.
+   * @param array $params
+   *   Any additional parameters to process.
+   */
+  protected function sendTestEmail($key = 'maillog_basic_test', array $params = array()) {
+    $langcode = language_default('language');
+    $from_email = 'from_test@example.com';
+    $to_email = 'to_test@example.com';
+    backdrop_mail('maillog_tests', $key, $to_email, $langcode, $params, $from_email);
   }
 
 }
