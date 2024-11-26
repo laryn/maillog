@@ -204,3 +204,38 @@ function maillog_update_1101() {
   cache_clear_all('*', 'cache_views', TRUE);
   cache_clear_all('*', 'cache_views_data', TRUE);
 }
+
+/**
+ * Rename the 'idmaillog' field to just 'id'.
+ */
+function maillog_update_1102() {
+  if (!db_field_exists('maillog', 'id')) {
+    // Add the new 'id' field.
+    $spec = array(
+      'type' => 'int',
+      'not null' => TRUE,
+      'unsigned' => TRUE,
+      'default' => 0,
+      'description' => "The primary key of this table.",
+    );
+    db_add_field('maillog', 'id', $spec);
+
+    // Fill in all of the 'id' fields.
+    db_query("UPDATE {maillog} SET id=idmaillog");
+
+    // Drop the 'idmaillog' field.
+    db_drop_field('maillog', 'idmaillog');
+
+    // Change the 'id' field to a serial.
+    $spec = array(
+      'type' => 'serial',
+      'unsigned' => TRUE,
+      'not null' => TRUE,
+      'description' => "The primary key of this table.",
+    );
+    $keys = array(
+      'primary key' => array('id'),
+    );
+    db_change_field('maillog', 'id', 'id', $spec, $keys);
+  }
+}

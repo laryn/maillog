@@ -285,15 +285,15 @@ function maillog_cron() {
   // e.g. auto_increment value > 1 or rows deleted directly from the table.
   if ($row_limit > 0) {
     $min_row = db_select('maillog', 'm')
-      ->fields('m', array('idmaillog'))
-      ->orderBy('idmaillog', 'DESC')
+      ->fields('m', array('id'))
+      ->orderBy('id', 'DESC')
       ->range($row_limit - 1, 1)
       ->execute()->fetchField();
 
     // Delete all table entries older than the nth row, if nth row was found.
     if ($min_row) {
       db_delete('maillog')
-        ->condition('idmaillog', $min_row, '<')
+        ->condition('id', $min_row, '<')
         ->execute();
     }
   }
