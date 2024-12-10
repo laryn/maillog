@@ -1,7 +1,7 @@
 {
     "_config_name": "views.view.maillog",
     "name": "maillog",
-    "description": "Displays the list of e-mails logged by the 'Mail Log' module.",
+    "description": "Displays the list of e-mails logged by the Maillog module.",
     "module": "maillog",
     "storage": 4,
     "tag": "",
@@ -130,7 +130,7 @@
                         "field": "subject",
                         "alter": {
                             "make_link": true,
-                            "path": "maillog/details/[idmaillog]"
+                            "path": "admin/reports/maillog/view/[id]"
                         }
                     },
                     "header_from": {
@@ -202,7 +202,7 @@
                         "alter": {
                             "text": "view",
                             "make_link": true,
-                            "path": "maillog/details/[idmaillog]"
+                            "path": "admin/reports/maillog/view/[id]"
                         },
                         "element_label_colon": false
                     },
