@@ -308,7 +308,6 @@ function maillog_cron() {
     // Delete all that are older than cut off time.
     $query = db_delete('maillog')
       ->condition('sent_date', $delete_time, '<');
-    dpq($query);
     $query->execute();
     watchdog('mailog', t('Deleted Mailog logs older than !time'), array('!time' => date('r', $delete_time)));
   }
