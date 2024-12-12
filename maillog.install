@@ -239,3 +239,22 @@ function maillog_update_1102() {
     db_change_field('maillog', 'id', 'id', $spec, $keys);
   }
 }
+
+/**
+ * Ensure the Maillog view has been updated so links function.
+ */
+function maillog_update_1103() {
+  // We're just going to do a targeted check on a few particulars rather than
+  // reload the entire view.
+  $view_config = config('views.view.maillog');
+  if ($view_config->get('description') == "Displays the list of e-mails logged by the 'Mail Log' module.") {
+    $view_config->set('description', 'Displays the list of email logged by the Maillog module.');
+  }
+  if ($view_config->get('display.default.display_options.fields.subject.alter.path') == 'maillog/details/[idmaillog]') {
+    $view_config->set('display.default.display_options.fields.subject.alter.path', 'admin/reports/maillog/view/[id]');
+  }
+  if ($view_config->get('display.default.display_options.fields.nothing.alter.path') == 'maillog/details/[idmaillog]') {
+    $view_config->set('display.default.display_options.fields.nothing.alter.path', 'admin/reports/maillog/view/[id]');
+  }
+  $view_config->save();
+}
